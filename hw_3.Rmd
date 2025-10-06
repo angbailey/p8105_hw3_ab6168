@@ -5,4 +5,45 @@ date: "2025-10-06"
 output: github_document
 ---
 
+## Problem 1
+
+Loading instacart dataset
+
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+data("instacart")
+```
+
+Viewing dataset
+
+```{r}
+view(instacart)
+```
+
+**Description**:
+
+The `instacart` data set contains information on grocery orders placed in 2017 by 131,209 unique users and includes 1,384,617 observations. There are a total of 15 variables describing the details of the order, product, and customer behavior. Each row in the data set is a product from an order. Key variables include:
+
+-   `order_id` – Unique identifier for each order
+
+-   `user_id` - Unique customer identifier
+
+-   `product_id` and `product_name` - Identify the specific item purchased
+
+-   `add_to_cart_order` - The sequence in which each product was added to the cart
+
+-   `reordered` - Indicates whether product had been purchased by the user before
+
+-   `order_dow` and `order_hour_of_day` - Represent when the order was placed
+
+-   `aisle` and `department` - Describe the product's category
+
+A few observations are that
+#orders purchased on day 0
+```{r}
+instacart |> filter(
+  order_dow == 0
+)
+```
 
