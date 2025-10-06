@@ -47,3 +47,92 @@ instacart |> filter(
 )
 ```
 
+
+- How many aisles are there, and which aisles are the most items ordered from?
+
+```{r}
+#getting number of unique aisles
+instacart |> summarise(n_distinct(aisle))
+```
+
+```{r}
+#finding aisles with the most items ordered
+instacart |> count(aisle, sort = TRUE)
+```
+
+There are **134 aisles**. Most items are ordered from the **Fresh Vegetables** and **Fresh Fruits** aisle. 
+
+
+- Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+
+```{r}
+#making bar chart
+instacart |> 
+  count(aisle, sort = TRUE) |>  #count of items for each aisle
+  filter(n > 10000) |> 
+  ggplot(aes(x = aisle, y = n)) +
+  geom_col(fill = "darkgreen") +
+  coord_flip() +  # flip for readability
+  labs(
+    title = "Number of Items Ordered per Aisle (Over 10,000 Orders)",
+       x = "Aisle",
+       y = "Number of Items Ordered"
+    )
+```
+
+
+
+- Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+
+```{r}
+knitr::kable(
+  instacart |>  
+  filter(aisle == c("baking ingredients", 
+                      "dog food care", 
+                      "packaged vegetables fruits")
+         ) |> 
+  count(aisle, product_name, sort = TRUE) |>  
+  group_by(aisle) |>  
+  slice_max(order_by = n, n = 3)
+)
+
+```
+
+
+
+
+- Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+
+```{r}
+instacart |> 
+  filter(
+    product_name == c("Pink Lady Apples", "Coffee Ice Cream")) |>  
+  group_by(product_name, order_dow) |>  
+  summarise(
+    mean_hour = round(mean(order_hour_of_day),1).  #getting mean for each day
+    ) |> 
+  pivot_wider(        
+    names_from = order_dow, 
+    values_from = mean_hour)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
