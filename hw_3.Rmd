@@ -1,0 +1,8 @@
+---
+title: "p8105_hw3_ab6168"
+author: "Angelica Bailey"
+date: "2025-10-06"
+output: github_document
+---
+
+
