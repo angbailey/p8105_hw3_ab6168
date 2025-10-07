@@ -116,8 +116,43 @@ instacart |>
 ```
 
 
+## Problem 2
+
+```{r}
+zori_df =
+  read_csv("data/zori_NYC.csv") |> 
+  select(-StateName, -State, -City, -Metro, - RegionType) |> 
+  #renaming variables
+  rename(
+    region_id = "RegionID",
+    size_rank = "SizeRank",
+    zip_code = "RegionName",
+    county = "CountyName"
+    ) |> 
+  mutate(
+    county = str_remove(county," County")
+  ) |>
+  pivot_longer(
+    cols = "2015-01-31":"2024-08-31",
+    names_to = "date",
+    values_to = "rent_price"
+  )
+
+zip_df = 
+  read_csv("data/Zip Codes.csv") |> 
+  janitor::clean_names() |> 
+  select(-state_fips, -file_date)
 
 
+join_zillow_df = 
+  left_join(zori_df, zip_df, by = c("zip_code", "county"))
+```
+
+
+Counting zip codes
+```{r}
+
+```
 
 
 
