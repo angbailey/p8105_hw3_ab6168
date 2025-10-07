@@ -99,8 +99,6 @@ knitr::kable(
 ```
 
 
-
-
 - Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
 ```{r}
