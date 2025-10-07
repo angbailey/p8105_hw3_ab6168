@@ -145,16 +145,36 @@ zip_df =
 
 
 join_zillow_df = 
-  left_join(zori_df, zip_df, by = c("zip_code", "county"))
+  left_join(zori_df, zip_df, by = c("zip_code", "county")) |> 
+  drop_na(rent_price)
 ```
 
 
-Counting zip codes
+
+There are 116 months between January 2015 and August 2024. How many ZIP codes are observed 116 times? How many are observed fewer than 10 times? Why are some ZIP codes are observed rarely and others observed in each month?
+
 ```{r}
+#How many ZIP codes are observed 116 times?
 
+join_zillow_df |> 
+  count(zip_code) |> 
+  filter(n == 116)
+```
+There are **48 zip codes** that are observed 116 times.
+
+
+```{r}
+#How many ZIP codes are observed fewer than 10 times?
+
+join_zillow_df |> 
+  count(zip_code) |> 
+  filter(n < 10)
 ```
 
+There are **26 zip codes** that are observed fewer than 10 times
 
+
+Some ZIP codes are observed rarely because there is a lack of information on the rent prices for this zip codes depending on the area. There may be litte to no rent properties in certain areas.
 
 
 
