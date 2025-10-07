@@ -178,9 +178,65 @@ Some ZIP codes are observed rarely because there is a lack of information on the
 
 
 
+Table showing average rental price by borough and year
+```{r}
+avg_rent = join_zillow_df |> 
+  #separating date
+  separate(date,
+    into = c("year", "month","day"), sep = "-") |> 
+  group_by(county, year) |> 
+  summarize(average_rent = mean(rent_price))
+
+knitr::kable(avg_rent)
+```
+
+
+In the Bronx, the rent was decreasing from 2015 to 2018. From 2019 to 2024, the rent increases substantially. In Kings county, the rent increases substantially from 2021 to 2024.In New York, from 2021 to 2022, the rent increases significantly. In Queens, from 2021 to 2024, the rent increases significantly.
+
+
+Make a plot showing NYC Rental Prices within ZIP codes for all available years. Your plot should facilitate comparisons across boroughs.
+```{r}
+
+
+#Queens
+queens_plot = join_zillow_df |>  
+  separate(date,
+           into = c("year", "month","day"), sep = "-") |> 
+  filter(county == "Queens") |> 
+  ggplot(aes(x = year, y = rent_price, ylim = c(0,5000))) +
+  geom_point()
 
 
 
+#Kings
+kings_plot = join_zillow_df |>  
+  separate(date,
+           into = c("year", "month","day"), sep = "-") |> 
+  filter(county == "Kings") |> 
+  ggplot(aes(x = year, y = rent_price, ylim = c(0,5000))) +
+  geom_point()
+
+
+
+#Bronx
+bronx_plot = join_zillow_df |>  
+  separate(date,
+           into = c("year", "month","day"), sep = "-") |> 
+  filter(county == "Bronx") |> 
+  ggplot(aes(x = year, y = rent_price, ylim = c(0,5000))) +
+  geom_point()
+
+
+
+#Richmond
+rich_plot = join_zillow_df |>  
+  separate(date,
+           into = c("year", "month","day"), sep = "-") |> 
+  filter(county == "Richmond") |> 
+  ggplot(aes(x = year, y = rent_price, ylim = c(0,5000))) +
+  geom_point()
+
+```
 
 
 
