@@ -405,13 +405,7 @@ plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = 
   geom_smooth(aes(group = county, color = county), se = FALSE, size = 1.0) +
   facet_wrap(~county, scales = "free_y") +
   scale_color_brewer(palette = "Set1") +
-  labs(
-    title = "NYC Rental Prices by ZIP Code and Borough",
-    subtitle = "Each line represents a ZIP code; smoothed trends show borough averages",
-    x = "Year",
-    y = "Average Rent",
-    color = "Borough"
-  )
+  scale_x_discrete(breaks = c("2015", "2024"))
 ```
 
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
@@ -419,6 +413,19 @@ plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = 
     ## This warning is displayed once every 8 hours.
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
+
+``` r
+  labs(
+    title = "NYC Rental Prices by ZIP Code and Borough",
+    subtitle = "Each line represents a ZIP code; smoothed trends show borough averages",
+    x = "Year",
+    y = "Average Rent",
+    color = "Borough"
+  ) +
+  theme(legend.position = "none")
+```
+
+    ## NULL
 
 From this plot showing NYC rental prices within ZIP codes for all
 available years, we can see that in almost all the boroughs, starting in
@@ -462,14 +469,17 @@ plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
   geom_line(alpha = 0.5) +
   facet_wrap(~ county, scales = "free_y") +
   scale_color_brewer(palette = "Set1") +
+  scale_x_discrete(breaks = c("Jan", "Dec"))
   labs(
     title = "ZIP-Code-Level Average Rents by Month in 2023",
-    subtitle = "Each line shows one ZIP code's monthly average rent; faceted by borough",
-    x = "Month (2023)",
+    x = "Month",
     y = "Average Rent",
     color = "Borough"
-  )
+  ) +
+  theme(legend.position = "none")
 ```
+
+    ## NULL
 
 From this plot showing average NYC rental prices each month in 2023
 across boroughs, we can see that Kings and New York county have more
@@ -498,3 +508,5 @@ combined_plot
     ## : There are other near singularities as well. 1
 
 ![](hw_3_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+## Problem 3
