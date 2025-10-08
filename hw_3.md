@@ -58,31 +58,30 @@ from an order. Key variables include:
 
 - `aisle` and `department` - Describe the product’s category
 
-A few observations are that \#orders purchased on day 0
+A few observations:
+
+- A total of 39123 unique products have been ordered.
+
+- From the table below we can see the three most ordered products are
+  bananas, strawberries, and spinach.
 
 ``` r
-instacart |> filter(
-  order_dow == 0
-)
+knitr::kable(instacart |> count(product_name, sort = TRUE) |> 
+               slice_head(n = 10))
 ```
 
-    ## # A tibble: 324,026 × 15
-    ##    order_id product_id add_to_cart_order reordered user_id eval_set order_number
-    ##       <int>      <int>             <int>     <int>   <int> <chr>           <int>
-    ##  1      170      18394                 1         1  182389 train               7
-    ##  2      170      37766                 2         1  182389 train               7
-    ##  3      170      13176                 3         1  182389 train               7
-    ##  4      170       6236                 4         1  182389 train               7
-    ##  5      170       5077                 5         1  182389 train               7
-    ##  6      170       8153                 6         0  182389 train               7
-    ##  7      170      43772                 7         0  182389 train               7
-    ##  8      170      25591                 8         0  182389 train               7
-    ##  9      170      34582                 9         0  182389 train               7
-    ## 10      170      49593                10         0  182389 train               7
-    ## # ℹ 324,016 more rows
-    ## # ℹ 8 more variables: order_dow <int>, order_hour_of_day <int>,
-    ## #   days_since_prior_order <int>, product_name <chr>, aisle_id <int>,
-    ## #   department_id <int>, aisle <chr>, department <chr>
+| product_name           |     n |
+|:-----------------------|------:|
+| Banana                 | 18726 |
+| Bag of Organic Bananas | 15480 |
+| Organic Strawberries   | 10894 |
+| Organic Baby Spinach   |  9784 |
+| Large Lemon            |  8135 |
+| Organic Avocado        |  7409 |
+| Organic Hass Avocado   |  7293 |
+| Strawberries           |  6494 |
+| Limes                  |  6033 |
+| Organic Raspberries    |  5546 |
 
 - How many aisles are there, and which aisles are the most items ordered
   from?

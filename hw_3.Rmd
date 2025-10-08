@@ -4,7 +4,7 @@ author: "Angelica Bailey"
 date: "2025-10-06"
 output: github_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ## Problem 1
@@ -41,16 +41,18 @@ The `instacart` data set contains information on grocery orders placed in 2017 b
 
 -   `aisle` and `department` - Describe the product's category
 
-A few observations are that
-#orders purchased on day 0
+A few observations:
+
+-   A total of `r instacart |> summarise(n_distinct(product_name))` unique products have been ordered.
+
+-   From the table below we can see the three most ordered products are bananas, strawberries, and spinach.
+
 ```{r}
-instacart |> filter(
-  order_dow == 0
-)
+knitr::kable(instacart |> count(product_name, sort = TRUE) |> 
+               slice_head(n = 10))
 ```
 
-
-- How many aisles are there, and which aisles are the most items ordered from?
+-   How many aisles are there, and which aisles are the most items ordered from?
 
 ```{r}
 #getting number of unique aisles
@@ -62,10 +64,9 @@ instacart |> summarise(n_distinct(aisle))
 instacart |> count(aisle, sort = TRUE)
 ```
 
-There are **134 aisles**. Most items are ordered from the **Fresh Vegetables** and **Fresh Fruits** aisle. 
+There are **134 aisles**. Most items are ordered from the **Fresh Vegetables** and **Fresh Fruits** aisle.
 
-
-- Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+-   Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
 
 ```{r}
 #making bar chart
@@ -82,9 +83,7 @@ instacart |>
     )
 ```
 
-
-
-- Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+-   Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
 
 ```{r}
 knitr::kable(
@@ -100,8 +99,7 @@ knitr::kable(
 
 ```
 
-
-- Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+-   Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
 ```{r}
 knitr::kable(instacart |> 
@@ -116,7 +114,6 @@ knitr::kable(instacart |>
     values_from = mean_hour)
 )
 ```
-
 
 ## Problem 2
 
@@ -151,8 +148,6 @@ join_zillow_df =
   drop_na(rent_price)
 ```
 
-
-
 There are 116 months between January 2015 and August 2024. How many ZIP codes are observed 116 times? How many are observed fewer than 10 times? Why are some ZIP codes are observed rarely and others observed in each month?
 
 ```{r}
@@ -162,8 +157,8 @@ join_zillow_df |>
   count(zip_code) |> 
   filter(n == 116)
 ```
-There are **48 zip codes** that are observed 116 times.
 
+There are **48 zip codes** that are observed 116 times.
 
 ```{r}
 #How many ZIP codes are observed fewer than 10 times?
@@ -175,12 +170,10 @@ join_zillow_df |>
 
 There are **26 zip codes** that are observed fewer than 10 times
 
-
 Some ZIP codes are observed rarely because there is a lack of information on the rent prices for this zip codes depending on the area. There may be litte to no rent properties in certain areas.
 
-
-
 Table showing average rental price by borough and year
+
 ```{r}
 avg_rent = join_zillow_df |> 
   #separating date
@@ -192,12 +185,7 @@ avg_rent = join_zillow_df |>
 knitr::kable(avg_rent)
 ```
 
-
 In the Bronx, the rent was decreasing from 2015 to 2018. From 2019 to 2024, the rent increases substantially. In Kings county, the rent increases substantially from 2021 to 2024.In New York, from 2021 to 2022, the rent increases significantly. In Queens, from 2021 to 2024, the rent increases significantly.
-
-
-
-
 
 Make a plot showing NYC Rental Prices within ZIP codes for all available years. Your plot should facilitate comparisons across boroughs.
 
@@ -224,9 +212,7 @@ ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) 
   )
 ```
 
-From this plot showing NYC rental prices within ZIP codes for all available years, we can see that in almost all the boroughs, starting in 2021, the rent prices go through a steeper increase. Richmond county does not have data for the zip codes before 2020. New York has the highest rent prices. 
-
-
+From this plot showing NYC rental prices within ZIP codes for all available years, we can see that in almost all the boroughs, starting in 2021, the rent prices go through a steeper increase. Richmond county does not have data for the zip codes before 2020. New York has the highest rent prices.
 
 Compute the average rental price within each ZIP code over each month in 2023. Make a reader-friendly plot showing the distribution of ZIP-code-level rental prices across boroughs
 
@@ -274,17 +260,4 @@ ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
   
 ```
 
-From this plot showing average NYC rental prices each month in 2023 across boroughs, we can see that Kings and New York county have more steady prices for each zip code throughout the year, however, for Richmond and Bronx county, there is more fluctuation in prices. 
-
-
-
-
-
-
-
-
-
-
-
-
-
+From this plot showing average NYC rental prices each month in 2023 across boroughs, we can see that Kings and New York county have more steady prices for each zip code throughout the year, however, for Richmond and Bronx county, there is more fluctuation in prices.
