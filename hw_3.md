@@ -1,0 +1,491 @@
+p8105_hw3_ab6168
+================
+Angelica Bailey
+2025-10-06
+
+## Problem 1
+
+Loading instacart dataset
+
+``` r
+library(tidyverse)
+```
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+    ## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
+    ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+    ## ✔ purrr     1.1.0     
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
+library(p8105.datasets)
+data("instacart")
+```
+
+Viewing dataset
+
+``` r
+view(instacart)
+```
+
+**Description**:
+
+The `instacart` data set contains information on grocery orders placed
+in 2017 by 131,209 unique users and includes 1,384,617 observations.
+There are a total of 15 variables describing the details of the order,
+product, and customer behavior. Each row in the data set is a product
+from an order. Key variables include:
+
+- `order_id` – Unique identifier for each order
+
+- `user_id` - Unique customer identifier
+
+- `product_id` and `product_name` - Identify the specific item purchased
+
+- `add_to_cart_order` - The sequence in which each product was added to
+  the cart
+
+- `reordered` - Indicates whether product had been purchased by the user
+  before
+
+- `order_dow` and `order_hour_of_day` - Represent when the order was
+  placed
+
+- `aisle` and `department` - Describe the product’s category
+
+A few observations are that \#orders purchased on day 0
+
+``` r
+instacart |> filter(
+  order_dow == 0
+)
+```
+
+    ## # A tibble: 324,026 × 15
+    ##    order_id product_id add_to_cart_order reordered user_id eval_set order_number
+    ##       <int>      <int>             <int>     <int>   <int> <chr>           <int>
+    ##  1      170      18394                 1         1  182389 train               7
+    ##  2      170      37766                 2         1  182389 train               7
+    ##  3      170      13176                 3         1  182389 train               7
+    ##  4      170       6236                 4         1  182389 train               7
+    ##  5      170       5077                 5         1  182389 train               7
+    ##  6      170       8153                 6         0  182389 train               7
+    ##  7      170      43772                 7         0  182389 train               7
+    ##  8      170      25591                 8         0  182389 train               7
+    ##  9      170      34582                 9         0  182389 train               7
+    ## 10      170      49593                10         0  182389 train               7
+    ## # ℹ 324,016 more rows
+    ## # ℹ 8 more variables: order_dow <int>, order_hour_of_day <int>,
+    ## #   days_since_prior_order <int>, product_name <chr>, aisle_id <int>,
+    ## #   department_id <int>, aisle <chr>, department <chr>
+
+- How many aisles are there, and which aisles are the most items ordered
+  from?
+
+``` r
+#getting number of unique aisles
+instacart |> summarise(n_distinct(aisle))
+```
+
+    ## # A tibble: 1 × 1
+    ##   `n_distinct(aisle)`
+    ##                 <int>
+    ## 1                 134
+
+``` r
+#finding aisles with the most items ordered
+instacart |> count(aisle, sort = TRUE)
+```
+
+    ## # A tibble: 134 × 2
+    ##    aisle                              n
+    ##    <chr>                          <int>
+    ##  1 fresh vegetables              150609
+    ##  2 fresh fruits                  150473
+    ##  3 packaged vegetables fruits     78493
+    ##  4 yogurt                         55240
+    ##  5 packaged cheese                41699
+    ##  6 water seltzer sparkling water  36617
+    ##  7 milk                           32644
+    ##  8 chips pretzels                 31269
+    ##  9 soy lactosefree                26240
+    ## 10 bread                          23635
+    ## # ℹ 124 more rows
+
+There are **134 aisles**. Most items are ordered from the **Fresh
+Vegetables** and **Fresh Fruits** aisle.
+
+- Make a plot that shows the number of items ordered in each aisle,
+  limiting this to aisles with more than 10000 items ordered. Arrange
+  aisles sensibly, and organize your plot so others can read it.
+
+``` r
+#making bar chart
+instacart |> 
+  count(aisle, sort = TRUE) |>  #count of items for each aisle
+  filter(n > 10000) |> 
+  ggplot(aes(x = aisle, y = n)) +
+  geom_col(fill = "darkgreen") +
+  coord_flip() +  # flip for readability
+  labs(
+    title = "Number of Items Ordered per Aisle (Over 10,000 Orders)",
+       x = "Aisle",
+       y = "Number of Items Ordered"
+    )
+```
+
+![](hw_3_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+- Make a table showing the three most popular items in each of the
+  aisles “baking ingredients”, “dog food care”, and “packaged vegetables
+  fruits”. Include the number of times each item is ordered in your
+  table.
+
+``` r
+knitr::kable(
+  instacart |>  
+  filter(aisle == c("baking ingredients", 
+                      "dog food care", 
+                      "packaged vegetables fruits")
+         ) |> 
+  count(aisle, product_name, sort = TRUE) |>  
+  group_by(aisle) |>  
+  slice_max(order_by = n, n = 3)
+)
+```
+
+| aisle | product_name | n |
+|:---|:---|---:|
+| baking ingredients | Light Brown Sugar | 157 |
+| baking ingredients | Pure Baking Soda | 140 |
+| baking ingredients | Organic Vanilla Extract | 122 |
+| dog food care | Organix Grain Free Chicken & Vegetable Dog Food | 14 |
+| dog food care | Organix Chicken & Brown Rice Recipe | 13 |
+| dog food care | Original Dry Dog | 9 |
+| packaged vegetables fruits | Organic Baby Spinach | 3324 |
+| packaged vegetables fruits | Organic Raspberries | 1920 |
+| packaged vegetables fruits | Organic Blueberries | 1692 |
+
+- Make a table showing the mean hour of the day at which Pink Lady
+  Apples and Coffee Ice Cream are ordered on each day of the week;
+  format this table for human readers (i.e. produce a 2 x 7 table).
+
+``` r
+knitr::kable(instacart |> 
+  filter(
+    product_name == c("Pink Lady Apples", "Coffee Ice Cream")) |>  
+  group_by(product_name, order_dow) |>  
+  summarise(
+    mean_hour = round(mean(order_hour_of_day),1), .groups = "drop"  #getting mean for each day
+    ) |> 
+  pivot_wider(        
+    names_from = order_dow, 
+    values_from = mean_hour)
+)
+```
+
+    ## Warning: There was 1 warning in `filter()`.
+    ## ℹ In argument: `product_name == c("Pink Lady Apples", "Coffee Ice Cream")`.
+    ## Caused by warning in `product_name == c("Pink Lady Apples", "Coffee Ice Cream")`:
+    ## ! longer object length is not a multiple of shorter object length
+
+| product_name     |    0 |    1 |    2 |    3 |    4 |    5 |    6 |
+|:-----------------|-----:|-----:|-----:|-----:|-----:|-----:|-----:|
+| Coffee Ice Cream | 13.2 | 15.0 | 15.3 | 15.4 | 15.2 | 10.3 | 12.4 |
+| Pink Lady Apples | 12.2 | 11.7 | 12.0 | 13.9 | 11.9 | 13.9 | 11.6 |
+
+## Problem 2
+
+``` r
+zori_df =
+  read_csv("data/zori_NYC.csv") |> 
+  select(-StateName, -State, -City, -Metro, - RegionType) |> 
+  #renaming variables
+  rename(
+    region_id = "RegionID",
+    size_rank = "SizeRank",
+    zip_code = "RegionName",
+    county = "CountyName"
+    ) |> 
+  mutate(
+    county = str_remove(county," County")
+  ) |>
+  pivot_longer(
+    cols = "2015-01-31":"2024-08-31",
+    names_to = "date",
+    values_to = "rent_price"
+  )
+```
+
+    ## Rows: 149 Columns: 125
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr   (6): RegionType, StateName, State, City, Metro, CountyName
+    ## dbl (119): RegionID, SizeRank, RegionName, 2015-01-31, 2015-02-28, 2015-03-3...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+zip_df = 
+  read_csv("data/Zip Codes.csv") |> 
+  janitor::clean_names() |> 
+  select(-state_fips, -file_date)
+```
+
+    ## Rows: 322 Columns: 7
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (4): County, County Code, File Date, Neighborhood
+    ## dbl (3): State FIPS, County FIPS, ZipCode
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+join_zillow_df = 
+  left_join(zori_df, zip_df, by = c("zip_code", "county")) |> 
+  drop_na(rent_price)
+```
+
+There are 116 months between January 2015 and August 2024. How many ZIP
+codes are observed 116 times? How many are observed fewer than 10 times?
+Why are some ZIP codes are observed rarely and others observed in each
+month?
+
+``` r
+#How many ZIP codes are observed 116 times?
+
+join_zillow_df |> 
+  count(zip_code) |> 
+  filter(n == 116)
+```
+
+    ## # A tibble: 48 × 2
+    ##    zip_code     n
+    ##       <dbl> <int>
+    ##  1    10001   116
+    ##  2    10002   116
+    ##  3    10003   116
+    ##  4    10005   116
+    ##  5    10010   116
+    ##  6    10012   116
+    ##  7    10013   116
+    ##  8    10014   116
+    ##  9    10017   116
+    ## 10    10018   116
+    ## # ℹ 38 more rows
+
+There are **48 zip codes** that are observed 116 times.
+
+``` r
+#How many ZIP codes are observed fewer than 10 times?
+
+join_zillow_df |> 
+  count(zip_code) |> 
+  filter(n < 10)
+```
+
+    ## # A tibble: 26 × 2
+    ##    zip_code     n
+    ##       <dbl> <int>
+    ##  1    10044     9
+    ##  2    10162     2
+    ##  3    10303     2
+    ##  4    10308     3
+    ##  5    10453     1
+    ##  6    10455     3
+    ##  7    10456     4
+    ##  8    10459     2
+    ##  9    10460     2
+    ## 10    10470     1
+    ## # ℹ 16 more rows
+
+There are **26 zip codes** that are observed fewer than 10 times
+
+Some ZIP codes are observed rarely because there is a lack of
+information on the rent prices for this zip codes depending on the area.
+There may be litte to no rent properties in certain areas.
+
+Table showing average rental price by borough and year
+
+``` r
+avg_rent = join_zillow_df |> 
+  #separating date
+  separate(date,
+    into = c("year", "month","day"), sep = "-") |> 
+  group_by(county, year) |> 
+  summarize(average_rent = mean(rent_price))
+```
+
+    ## `summarise()` has grouped output by 'county'. You can override using the
+    ## `.groups` argument.
+
+``` r
+knitr::kable(avg_rent)
+```
+
+| county   | year | average_rent |
+|:---------|:-----|-------------:|
+| Bronx    | 2015 |     1759.595 |
+| Bronx    | 2016 |     1520.194 |
+| Bronx    | 2017 |     1543.599 |
+| Bronx    | 2018 |     1639.430 |
+| Bronx    | 2019 |     1705.589 |
+| Bronx    | 2020 |     1811.443 |
+| Bronx    | 2021 |     1857.777 |
+| Bronx    | 2022 |     2054.267 |
+| Bronx    | 2023 |     2285.459 |
+| Bronx    | 2024 |     2496.896 |
+| Kings    | 2015 |     2492.928 |
+| Kings    | 2016 |     2520.357 |
+| Kings    | 2017 |     2545.828 |
+| Kings    | 2018 |     2547.291 |
+| Kings    | 2019 |     2630.504 |
+| Kings    | 2020 |     2555.051 |
+| Kings    | 2021 |     2549.890 |
+| Kings    | 2022 |     2868.199 |
+| Kings    | 2023 |     3015.184 |
+| Kings    | 2024 |     3126.803 |
+| New York | 2015 |     3022.042 |
+| New York | 2016 |     3038.818 |
+| New York | 2017 |     3133.848 |
+| New York | 2018 |     3183.703 |
+| New York | 2019 |     3310.408 |
+| New York | 2020 |     3106.517 |
+| New York | 2021 |     3136.632 |
+| New York | 2022 |     3778.375 |
+| New York | 2023 |     3932.610 |
+| New York | 2024 |     4078.440 |
+| Queens   | 2015 |     2214.707 |
+| Queens   | 2016 |     2271.955 |
+| Queens   | 2017 |     2263.303 |
+| Queens   | 2018 |     2291.918 |
+| Queens   | 2019 |     2387.816 |
+| Queens   | 2020 |     2315.632 |
+| Queens   | 2021 |     2210.787 |
+| Queens   | 2022 |     2406.038 |
+| Queens   | 2023 |     2561.615 |
+| Queens   | 2024 |     2694.022 |
+| Richmond | 2020 |     1977.608 |
+| Richmond | 2021 |     2045.430 |
+| Richmond | 2022 |     2147.436 |
+| Richmond | 2023 |     2332.934 |
+| Richmond | 2024 |     2536.442 |
+
+In the Bronx, the rent was decreasing from 2015 to 2018. From 2019 to
+2024, the rent increases substantially. In Kings county, the rent
+increases substantially from 2021 to 2024.In New York, from 2021 to
+2022, the rent increases significantly. In Queens, from 2021 to 2024,
+the rent increases significantly.
+
+Make a plot showing NYC Rental Prices within ZIP codes for all available
+years. Your plot should facilitate comparisons across boroughs.
+
+``` r
+#average rent per zip per year
+zip_avg = join_zillow_df |> 
+  separate(date,
+           into = c("year", "month","day"), sep = "-") |> 
+  group_by(county, zip_code, year) |> 
+  summarize(mean_rent = mean(rent_price, na.rm = TRUE), .groups = "drop")
+
+#creating plot to compare across boroughs
+ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
+  geom_line(alpha = 0.4) +
+  geom_smooth(aes(group = county, color = county), se = FALSE, size = 1.0) +
+  facet_wrap(~county, scales = "free_y") +
+  scale_color_brewer(palette = "Set1") +
+  labs(
+    title = "NYC Rental Prices by ZIP Code and Borough",
+    subtitle = "Each line represents a ZIP code; smoothed trends show borough averages",
+    x = "Year",
+    y = "Average Rent",
+    color = "Borough"
+  )
+```
+
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : pseudoinverse used at 10.02
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : neighborhood radius 2.02
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : reciprocal condition number 0
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : There are other near singularities as well. 1
+
+![](hw_3_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+From this plot showing NYC rental prices within ZIP codes for all
+available years, we can see that in almost all the boroughs, starting in
+2021, the rent prices go through a steeper increase. Richmond county
+does not have data for the zip codes before 2020. New York has the
+highest rent prices.
+
+Compute the average rental price within each ZIP code over each month in
+2023. Make a reader-friendly plot showing the distribution of
+ZIP-code-level rental prices across boroughs
+
+``` r
+#computing average rent within each zip in 2023
+rent_2023 = join_zillow_df |> 
+  separate(date,
+           into = c("year", "month","day"), sep = "-") |> 
+  filter(year == 2023) |> 
+  group_by(county, zip_code, month) |> 
+  summarize(avg_monthly_rent = mean(rent_price, na.rm = TRUE), .groups = "drop") |> 
+  mutate(
+    month = case_when(
+      month == "01" ~ "Jan",
+      month == "02" ~ "Feb",
+      month == "03" ~ "Mar",
+      month == "04" ~ "Apr",
+      month == "05" ~ "May",
+      month == "06" ~ "Jun",
+      month == "07" ~ "Jul",
+      month == "08" ~ "Aug",
+      month == "09" ~ "Sep",
+      month == "10" ~ "Oct",
+      month == "11" ~ "Nov",
+      month == "12" ~ "Dec"
+    )
+  ) |> 
+  mutate(month = factor(month, levels = month.abb, ordered = TRUE))
+
+
+ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
+                      group = zip_code, color = county )) +
+  geom_line(alpha = 0.5) +
+  facet_wrap(~ county, scales = "free_y") +
+  scale_color_brewer(palette = "Set1") +
+  labs(
+    title = "ZIP-Code-Level Average Rents by Month in 2023",
+    subtitle = "Each line shows one ZIP code's monthly average rent; faceted by borough",
+    x = "Month (2023)",
+    y = "Average Rent",
+    color = "Borough"
+  )
+```
+
+![](hw_3_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+From this plot showing average NYC rental prices each month in 2023
+across boroughs, we can see that Kings and New York county have more
+steady prices for each zip code throughout the year, however, for
+Richmond and Bronx county, there is more fluctuation in prices.
