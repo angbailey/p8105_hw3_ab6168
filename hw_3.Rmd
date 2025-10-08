@@ -285,13 +285,28 @@ combined_plot <- plot1/plot2
 combined_plot
 ```
 
+Saving plot
+```{r}
+ggsave(
+  filename = "combined_plot.png",  
+  plot = combined_plot,            
+  path = "results"
+)
+```
 
 
 ## Problem 3
 
+Load, tidy, merge, and otherwise organize the data sets. Your final dataset should include all originally observed variables; exclude participants less than 21 years of age, and those with missing demographic data; and encode data with reasonable variable classes (i.e. not numeric, and using factors with the ordering of tables and plots in mind).
+
+```{r}
+demo_df = 
+  read_csv("data/nhanes_covar.csv")
 
 
-
+accel_df =
+  read.csv("data/nhanes_accel.csv")
+```
 
 
 
