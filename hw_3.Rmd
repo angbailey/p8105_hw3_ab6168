@@ -4,7 +4,7 @@ author: "Angelica Bailey"
 date: "2025-10-06"
 output: github_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ## Problem 1
@@ -14,6 +14,7 @@ Loading instacart dataset
 ```{r}
 library(tidyverse)
 library(p8105.datasets)
+library(patchwork)
 data("instacart")
 ```
 
@@ -66,6 +67,7 @@ instacart |> count(aisle, sort = TRUE)
 
 There are **134 aisles**. Most items are ordered from the **Fresh Vegetables** and **Fresh Fruits** aisle.
 
+
 -   Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
 
 ```{r}
@@ -83,6 +85,7 @@ instacart |>
     )
 ```
 
+
 -   Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
 
 ```{r}
@@ -98,6 +101,7 @@ knitr::kable(
 )
 
 ```
+
 
 -   Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
@@ -115,7 +119,10 @@ knitr::kable(instacart |>
 )
 ```
 
+
 ## Problem 2
+
+Tidying Zillow datasets
 
 ```{r}
 zori_df =
@@ -142,13 +149,14 @@ zip_df =
   janitor::clean_names() |> 
   select(-state_fips, -file_date)
 
-
+#joining datasets
 join_zillow_df = 
   left_join(zori_df, zip_df, by = c("zip_code", "county")) |> 
   drop_na(rent_price)
 ```
 
-There are 116 months between January 2015 and August 2024. How many ZIP codes are observed 116 times? How many are observed fewer than 10 times? Why are some ZIP codes are observed rarely and others observed in each month?
+
+-   There are 116 months between January 2015 and August 2024. How many ZIP codes are observed 116 times? How many are observed fewer than 10 times? Why are some ZIP codes are observed rarely and others observed in each month?
 
 ```{r}
 #How many ZIP codes are observed 116 times?
@@ -160,6 +168,7 @@ join_zillow_df |>
 
 There are **48 zip codes** that are observed 116 times.
 
+
 ```{r}
 #How many ZIP codes are observed fewer than 10 times?
 
@@ -168,11 +177,12 @@ join_zillow_df |>
   filter(n < 10)
 ```
 
-There are **26 zip codes** that are observed fewer than 10 times
+There are **26 zip codes** that are observed fewer than 10 times.
 
-Some ZIP codes are observed rarely because there is a lack of information on the rent prices for this zip codes depending on the area. There may be litte to no rent properties in certain areas.
+Some ZIP codes are observed rarely because there is a lack of information on the rent prices for this zip codes depending on the area. There may be little to no rent properties in certain areas.
 
-Table showing average rental price by borough and year
+
+**Table showing average rental price by borough and year**
 
 ```{r}
 avg_rent = join_zillow_df |> 
@@ -187,7 +197,7 @@ knitr::kable(avg_rent)
 
 In the Bronx, the rent was decreasing from 2015 to 2018. From 2019 to 2024, the rent increases substantially. In Kings county, the rent increases substantially from 2021 to 2024.In New York, from 2021 to 2022, the rent increases significantly. In Queens, from 2021 to 2024, the rent increases significantly.
 
-Make a plot showing NYC Rental Prices within ZIP codes for all available years. Your plot should facilitate comparisons across boroughs.
+-   Make a plot showing NYC Rental Prices within ZIP codes for all available years. Your plot should facilitate comparisons across boroughs.
 
 ```{r}
 #average rent per zip per year
@@ -198,7 +208,7 @@ zip_avg = join_zillow_df |>
   summarize(mean_rent = mean(rent_price, na.rm = TRUE), .groups = "drop")
 
 #creating plot to compare across boroughs
-ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
+plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
   geom_line(alpha = 0.4) +
   geom_smooth(aes(group = county, color = county), se = FALSE, size = 1.0) +
   facet_wrap(~county, scales = "free_y") +
@@ -213,6 +223,7 @@ ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) 
 ```
 
 From this plot showing NYC rental prices within ZIP codes for all available years, we can see that in almost all the boroughs, starting in 2021, the rent prices go through a steeper increase. Richmond county does not have data for the zip codes before 2020. New York has the highest rent prices.
+
 
 Compute the average rental price within each ZIP code over each month in 2023. Make a reader-friendly plot showing the distribution of ZIP-code-level rental prices across boroughs
 
@@ -243,7 +254,7 @@ rent_2023 = join_zillow_df |>
   mutate(month = factor(month, levels = month.abb, ordered = TRUE))
 
 
-ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
+plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
                       group = zip_code, color = county )) +
   geom_line(alpha = 0.5) +
   facet_wrap(~ county, scales = "free_y") +
@@ -260,4 +271,24 @@ ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
   
 ```
 
-From this plot showing average NYC rental prices each month in 2023 across boroughs, we can see that Kings and New York county have more steady prices for each zip code throughout the year, however, for Richmond and Bronx county, there is more fluctuation in prices.
+From this plot showing average NYC rental prices each month in 2023 across boroughs, we can see that Kings and New York county have more steady prices for each zip code throughout the year, however, for Richmond and Bronx county, there is more fluctuation in prices./
+
+
+**Combining Plots**
+
+```{r}
+combined_plot <- plot1/plot2
+combined_plot
+```
+
+
+
+
+
+
+
+
+
+
+
+

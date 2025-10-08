@@ -24,6 +24,7 @@ library(tidyverse)
 
 ``` r
 library(p8105.datasets)
+library(patchwork)
 data("instacart")
 ```
 
@@ -200,6 +201,8 @@ knitr::kable(instacart |>
 
 ## Problem 2
 
+Tidying Zillow datasets
+
 ``` r
 zori_df =
   read_csv("data/zori_NYC.csv") |> 
@@ -247,15 +250,16 @@ zip_df =
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
+#joining datasets
 join_zillow_df = 
   left_join(zori_df, zip_df, by = c("zip_code", "county")) |> 
   drop_na(rent_price)
 ```
 
-There are 116 months between January 2015 and August 2024. How many ZIP
-codes are observed 116 times? How many are observed fewer than 10 times?
-Why are some ZIP codes are observed rarely and others observed in each
-month?
+- There are 116 months between January 2015 and August 2024. How many
+  ZIP codes are observed 116 times? How many are observed fewer than 10
+  times? Why are some ZIP codes are observed rarely and others observed
+  in each month?
 
 ``` r
 #How many ZIP codes are observed 116 times?
@@ -305,13 +309,13 @@ join_zillow_df |>
     ## 10    10470     1
     ## # ℹ 16 more rows
 
-There are **26 zip codes** that are observed fewer than 10 times
+There are **26 zip codes** that are observed fewer than 10 times.
 
 Some ZIP codes are observed rarely because there is a lack of
 information on the rent prices for this zip codes depending on the area.
-There may be litte to no rent properties in certain areas.
+There may be little to no rent properties in certain areas.
 
-Table showing average rental price by borough and year
+**Table showing average rental price by borough and year**
 
 ``` r
 avg_rent = join_zillow_df |> 
@@ -383,8 +387,9 @@ increases substantially from 2021 to 2024.In New York, from 2021 to
 2022, the rent increases significantly. In Queens, from 2021 to 2024,
 the rent increases significantly.
 
-Make a plot showing NYC Rental Prices within ZIP codes for all available
-years. Your plot should facilitate comparisons across boroughs.
+- Make a plot showing NYC Rental Prices within ZIP codes for all
+  available years. Your plot should facilitate comparisons across
+  boroughs.
 
 ``` r
 #average rent per zip per year
@@ -395,7 +400,7 @@ zip_avg = join_zillow_df |>
   summarize(mean_rent = mean(rent_price, na.rm = TRUE), .groups = "drop")
 
 #creating plot to compare across boroughs
-ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
+plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
   geom_line(alpha = 0.4) +
   geom_smooth(aes(group = county, color = county), se = FALSE, size = 1.0) +
   facet_wrap(~county, scales = "free_y") +
@@ -414,22 +419,6 @@ ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) 
     ## This warning is displayed once every 8 hours.
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
-
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : pseudoinverse used at 10.02
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : neighborhood radius 2.02
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : reciprocal condition number 0
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : There are other near singularities as well. 1
-
-![](hw_3_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 From this plot showing NYC rental prices within ZIP codes for all
 available years, we can see that in almost all the boroughs, starting in
@@ -468,7 +457,7 @@ rent_2023 = join_zillow_df |>
   mutate(month = factor(month, levels = month.abb, ordered = TRUE))
 
 
-ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
+plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
                       group = zip_code, color = county )) +
   geom_line(alpha = 0.5) +
   facet_wrap(~ county, scales = "free_y") +
@@ -482,9 +471,30 @@ ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
   )
 ```
 
-![](hw_3_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-
 From this plot showing average NYC rental prices each month in 2023
 across boroughs, we can see that Kings and New York county have more
 steady prices for each zip code throughout the year, however, for
-Richmond and Bronx county, there is more fluctuation in prices.
+Richmond and Bronx county, there is more fluctuation in prices./
+
+**Combining Plots**
+
+``` r
+combined_plot <- plot1/plot2
+combined_plot
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : pseudoinverse used at 10.02
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : neighborhood radius 2.02
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : reciprocal condition number 0
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : There are other near singularities as well. 1
+
+![](hw_3_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
