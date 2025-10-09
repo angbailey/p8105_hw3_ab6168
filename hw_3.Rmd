@@ -4,7 +4,7 @@ author: "Angelica Bailey"
 date: "2025-10-06"
 output: github_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ## Problem 1
@@ -15,12 +15,12 @@ Loading instacart dataset
 library(tidyverse)
 library(p8105.datasets)
 library(patchwork)
-data("instacart")
 ```
 
 Viewing dataset
 
 ```{r}
+data("instacart")
 view(instacart)
 ```
 
@@ -190,7 +190,7 @@ avg_rent = join_zillow_df |>
   separate(date,
     into = c("year", "month","day"), sep = "-") |> 
   group_by(county, year) |> 
-  summarize(average_rent = mean(rent_price))
+  summarize(average_rent = mean(rent_price)) 
 
 knitr::kable(avg_rent)
 ```
@@ -299,16 +299,33 @@ ggsave(
 
 Load, tidy, merge, and otherwise organize the data sets. Your final dataset should include all originally observed variables; exclude participants less than 21 years of age, and those with missing demographic data; and encode data with reasonable variable classes (i.e. not numeric, and using factors with the ordering of tables and plots in mind).
 
+cleaning demographic file
 ```{r}
 demo_df = 
-  read_csv("data/nhanes_covar.csv")
-
-
-accel_df =
-  read.csv("data/nhanes_accel.csv")
+  read_csv("data/nhanes_covar.csv") |> 
+  filter(row_number() > 3) 
+colnames(demo_df) <- demo_df[1, ] #assigning first row as column names
+demo_df <- demo_df[-1, ] #removing first row
+demo_df =
+  demo_df |> janitor::clean_names() |> 
+  filter(age >= 21) |> 
+  drop_na(bmi) |> 
+  mutate(sex = as.character(sex), 
+         sex = case_match(
+           sex,
+           "1" ~ "male",
+           "2" ~ "female")
+  ) |> 
+  mutate(education = as.factor(education))
 ```
 
 
+cleaning accel file
+```{r}
+accel_df =
+  read.csv("data/nhanes_accel.csv") |> 
+  janitor::clean_names()
+```
 
 
 
