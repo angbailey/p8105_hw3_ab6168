@@ -324,8 +324,70 @@ cleaning accel file
 ```{r}
 accel_df =
   read.csv("data/nhanes_accel.csv") |> 
-  janitor::clean_names()
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = min1:min1440,
+    names_to = "minute",
+    values_to = "mims"
+  ) |> 
+  mutate(minute = gsub("min", "", minute))
 ```
+
+
+merging files
+```{r}
+mims_df =
+  left_join(demo_df, accel_df)
+```
+
+
+Produce a reader-friendly table for the number of men and women in each education category
+```{r}
+sex_educ =
+  demo_df |> 
+  count(sex, education) |> 
+  pivot_wider(names_from = sex, 
+              values_from = n) |> 
+  mutate(education = as.numeric(as.character(education)),
+         education =
+           case_match(
+             education,
+             1 ~ "Less than High School",
+             2 ~ "High School Equivalent",
+             3 ~ "More than High School"
+           ))
+
+knitr::kable(sex_educ)
+```
+
+There are more males than females who have a high school equivalent education. The number of females who've done less than high school is similar to the number of males who've done less than highschool. This is the same case for those who've completed more than highschool.
+
+
+Create a visualization of the age distributions for men and women in each education category
+```{r}
+demo_df |>
+  
+  group_by(sex, gender) |>
+  ggplot(demo_df, aes(x = age, color = sex)) +
+      geom_density()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
