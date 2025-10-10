@@ -5,15 +5,13 @@ Angelica Bailey
 
 ## Problem 1
 
-Loading instacart dataset
-
 ``` r
 library(tidyverse)
 library(p8105.datasets)
 library(patchwork)
 ```
 
-Viewing dataset
+Loading instacart dataset
 
 ``` r
 data("instacart")
@@ -107,7 +105,9 @@ instacart |> count(aisle, sort = TRUE)
     ## # ℹ 124 more rows
 
 There are **134 aisles**. Most items are ordered from the **Fresh
-Vegetables** and **Fresh Fruits** aisle. <br>
+Vegetables** and **Fresh Fruits** aisle.
+
+<br>
 
 **Plot showing the number of items ordered in each aisle.**
 
@@ -126,10 +126,12 @@ instacart |>
     )
 ```
 
-![](hw_3_files/figure-gfm/unnamed-chunk-6-1.png)<!-- --> <br>
+![](hw_3_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+<br>
 
 **Three most popular items in each of the aisles “baking ingredients”,
-“dog food care”, and “packaged vegetables fruits”.**
+“dog food care”, and “packaged vegetables fruits”:**
 
 ``` r
 knitr::kable(
@@ -159,7 +161,7 @@ knitr::kable(
 <br>
 
 **Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream
-are ordered on each day of the week.**
+are ordered on each day of the week:**
 
 ``` r
 knitr::kable(instacart |> 
@@ -274,7 +276,9 @@ There are **26 zip codes** that are observed fewer than 10 times.
 
 Some ZIP codes may be observed rarely because there is a lack of
 information on the rent prices for those zip codes depending on the
-area. There may be little to no rent properties in certain areas. <br>
+area. There may be little to no rent properties in certain areas.
+
+<br>
 
 **Table showing average rental price by borough and year**
 
@@ -311,6 +315,7 @@ First, we can see that Richmond county does not have data from 2015 to
 most boroughs from 2021 to 2024. From 2019 to 2020, we see that prices
 in boroughs like Manhattan, Brooklyn, and Queens dipped before
 increasing back in 2021, reflecting the market disruption around 2020.
+
 <br>
 
 **Make a plot showing NYC Rental Prices within ZIP codes for all
@@ -359,7 +364,9 @@ Manhattan, some ZIP codes have average rents approaching \$8,000, while
 others are closer to \$4,000. On the other hand, the lines for the
 Bronx, Queens, and Richmond are more close around their average trend
 lines. While there is still variation, the difference between the most
-and least expensice neighborhoods are significantly smaller. <br>
+and least expensice neighborhoods are significantly smaller.
+
+<br>
 
 **Compute the average rental price within each ZIP code over each month
 in 2023. Make a reader-friendly plot showing the distribution of
@@ -414,7 +421,9 @@ plot2
 From this plot showing average NYC rental prices each month in 2023
 across boroughs, we can see that Kings and New York county have more
 steady prices for each zip code throughout the year, however, for
-Richmond and Bronx county, there is more fluctuation in prices. <br>
+Richmond and Bronx county, there is more fluctuation in prices.
+
+<br>
 
 **Combining Plots**
 
@@ -447,20 +456,6 @@ Cleaning demographic dataset
 demo_df = 
   read_csv("data/nhanes_covar.csv") |> 
   filter(row_number() > 3) 
-```
-
-    ## New names:
-    ## Rows: 254 Columns: 5
-    ## ── Column specification
-    ## ──────────────────────────────────────────────────────── Delimiter: "," chr
-    ## (5): ...1, 1 = male, ...3, ...4, 1 = Less than high school
-    ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
-    ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
-    ## • `` -> `...1`
-    ## • `` -> `...3`
-    ## • `` -> `...4`
-
-``` r
 colnames(demo_df) <- demo_df[1, ] #assigning first row as column names
 demo_df <- demo_df[-1, ] #removing first row
 demo_df =
@@ -505,7 +500,7 @@ mims_df =
 <br>
 
 **Produce a reader-friendly table for the number of men and women in
-each education category**
+each education category:**
 
 ``` r
 sex_educ =
@@ -534,10 +529,12 @@ knitr::kable(sex_educ, title = "Number of Participants by Education Level and Se
 There are more males than females who have a high school equivalent
 education. The number of females who’ve done less than high school is
 similar to the number of males who’ve done less than highschool. This is
-the same case for those who’ve completed more than highschool. <br>
+the same case for those who’ve completed more than highschool.
+
+<br>
 
 **Create a visualization of the age distributions for men and women in
-each education category**
+each education category:**
 
 ``` r
 #setting up data frame for plot
@@ -573,3 +570,113 @@ age bracket. In the other two groups, the age distribution is more
 evenly spread out across all age ranges. There is no single dominant age
 group. The overall number of participants in each age group is generally
 low.
+
+<br> <br>
+
+**Looking at total acitivity over the day**
+
+Aggregating mims across minutes for each participant:
+
+``` r
+activity_df = mims_df |> 
+  group_by(seqn, sex, age, bmi, education) |> 
+  summarise(
+    total_activity = sum(mims),
+    .groups = "drop"
+  ) |> 
+  mutate(education = as.numeric(as.character(education)),
+         education =
+           case_match(
+             education,
+             1 ~ "Less than High School",
+             2 ~ "High School Equivalent",
+             3 ~ "More than High School"
+           ))
+```
+
+<br>
+
+Creating plot
+
+``` r
+# plotting total activity against age, faceted by education, and colored by gender
+ggplot(activity_df, aes(x = age, y = total_activity, color = sex)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(se = FALSE, linewidth = 1) +
+  facet_wrap(~ education) +
+  labs(
+    title = "Total Daily Activity vs. Age by Education and Gender",
+    subtitle = "Each point is one participant. Lines show smoothed trends.",
+    x = "Age",
+    y = "Total Daily Activity (Sum of MIMS)"
+  )
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+![](hw_3_files/figure-gfm/unnamed-chunk-23-1.png)<!-- --> <br>
+
+Across all education levels, we see a general decline in total activity
+as participants get older. In the High School Equivalent group, we know
+there are significantly more males than females, therefore it appears
+that the females have a higher average activity level than males
+especially at a younger age. In the Less than High School group, the
+trend lines for both sexes are very close together and follow an almost
+identical pattern with a steep decline as age increases. Among those
+with a higher education, females have a consistently higher level of
+activity than males across almost the entire age range.
+
+<br> <br>
+
+**Looking at 24-hour activity**
+
+``` r
+# calculate average activity for each hour
+hourly_activity = mims_df |> 
+  mutate(
+    minute = as.numeric(minute),
+    hour_of_day = floor((minute - 1) / 60)
+  ) |> 
+  group_by(seqn, education, sex, hour_of_day) |> 
+  summarise(
+    mean_hourly_activity = mean(mims),
+    .groups = 'drop'
+  ) |>
+  mutate(education = as.numeric(as.character(education)),
+         education =
+           case_match(
+             education,
+             1 ~ "Less than High School",
+             2 ~ "High School Equivalent",
+             3 ~ "More than High School"
+           ))
+```
+
+Creating plot
+
+``` r
+ggplot(hourly_activity, aes(x = hour_of_day, y = mean_hourly_activity, fill = sex)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~ education, ncol = 2) +
+  scale_x_continuous(
+    name = "Time of Day (Hour)",
+    breaks = c(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22)
+  ) +
+  
+  labs(
+    title = "Average Hourly Activity by Education Level and Gender",
+    subtitle = "Activity has been averaged for each hour of the day.",
+    y = "Mean Hourly MIMS Activity"
+  )
+```
+
+![](hw_3_files/figure-gfm/unnamed-chunk-25-1.png)<!-- --> <br>
+
+The hourly activity in the “High School Equivalent” and “Less than High
+School” groups follow a similar pattern. Activity beings to rise around
+6 or 7 AM and stays consistently high throughout the day with a gradual
+decline in the late evening. Within these two groups, there does not
+seem to be a significantly different pattern between males and females.
+In the “More than High School” group, females show a high peak of
+activity around 8 AM, while males show a high peak of activity in the
+late evening.
