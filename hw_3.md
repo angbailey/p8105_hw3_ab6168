@@ -25,12 +25,12 @@ library(tidyverse)
 ``` r
 library(p8105.datasets)
 library(patchwork)
-data("instacart")
 ```
 
 Viewing dataset
 
 ``` r
+data("instacart")
 view(instacart)
 ```
 
@@ -323,7 +323,11 @@ avg_rent = join_zillow_df |>
   separate(date,
     into = c("year", "month","day"), sep = "-") |> 
   group_by(county, year) |> 
-  summarize(average_rent = mean(rent_price))
+  summarize(average_rent = mean(rent_price)) |> 
+  pivot_wider(
+    names_from = county,
+    values_from = average_rent
+  )
 ```
 
     ## `summarise()` has grouped output by 'county'. You can override using the
@@ -333,53 +337,18 @@ avg_rent = join_zillow_df |>
 knitr::kable(avg_rent)
 ```
 
-| county   | year | average_rent |
-|:---------|:-----|-------------:|
-| Bronx    | 2015 |     1759.595 |
-| Bronx    | 2016 |     1520.194 |
-| Bronx    | 2017 |     1543.599 |
-| Bronx    | 2018 |     1639.430 |
-| Bronx    | 2019 |     1705.589 |
-| Bronx    | 2020 |     1811.443 |
-| Bronx    | 2021 |     1857.777 |
-| Bronx    | 2022 |     2054.267 |
-| Bronx    | 2023 |     2285.459 |
-| Bronx    | 2024 |     2496.896 |
-| Kings    | 2015 |     2492.928 |
-| Kings    | 2016 |     2520.357 |
-| Kings    | 2017 |     2545.828 |
-| Kings    | 2018 |     2547.291 |
-| Kings    | 2019 |     2630.504 |
-| Kings    | 2020 |     2555.051 |
-| Kings    | 2021 |     2549.890 |
-| Kings    | 2022 |     2868.199 |
-| Kings    | 2023 |     3015.184 |
-| Kings    | 2024 |     3126.803 |
-| New York | 2015 |     3022.042 |
-| New York | 2016 |     3038.818 |
-| New York | 2017 |     3133.848 |
-| New York | 2018 |     3183.703 |
-| New York | 2019 |     3310.408 |
-| New York | 2020 |     3106.517 |
-| New York | 2021 |     3136.632 |
-| New York | 2022 |     3778.375 |
-| New York | 2023 |     3932.610 |
-| New York | 2024 |     4078.440 |
-| Queens   | 2015 |     2214.707 |
-| Queens   | 2016 |     2271.955 |
-| Queens   | 2017 |     2263.303 |
-| Queens   | 2018 |     2291.918 |
-| Queens   | 2019 |     2387.816 |
-| Queens   | 2020 |     2315.632 |
-| Queens   | 2021 |     2210.787 |
-| Queens   | 2022 |     2406.038 |
-| Queens   | 2023 |     2561.615 |
-| Queens   | 2024 |     2694.022 |
-| Richmond | 2020 |     1977.608 |
-| Richmond | 2021 |     2045.430 |
-| Richmond | 2022 |     2147.436 |
-| Richmond | 2023 |     2332.934 |
-| Richmond | 2024 |     2536.442 |
+| year |    Bronx |    Kings | New York |   Queens | Richmond |
+|:-----|---------:|---------:|---------:|---------:|---------:|
+| 2015 | 1759.595 | 2492.928 | 3022.042 | 2214.707 |       NA |
+| 2016 | 1520.194 | 2520.357 | 3038.818 | 2271.955 |       NA |
+| 2017 | 1543.599 | 2545.828 | 3133.848 | 2263.303 |       NA |
+| 2018 | 1639.430 | 2547.291 | 3183.703 | 2291.918 |       NA |
+| 2019 | 1705.589 | 2630.504 | 3310.408 | 2387.816 |       NA |
+| 2020 | 1811.443 | 2555.051 | 3106.517 | 2315.632 | 1977.608 |
+| 2021 | 1857.777 | 2549.890 | 3136.632 | 2210.787 | 2045.430 |
+| 2022 | 2054.267 | 2868.199 | 3778.375 | 2406.038 | 2147.436 |
+| 2023 | 2285.459 | 3015.184 | 3932.610 | 2561.615 | 2332.934 |
+| 2024 | 2496.896 | 3126.803 | 4078.440 | 2694.022 | 2536.442 |
 
 In the Bronx, the rent was decreasing from 2015 to 2018. From 2019 to
 2024, the rent increases substantially. In Kings county, the rent
@@ -402,10 +371,18 @@ zip_avg = join_zillow_df |>
 #creating plot to compare across boroughs
 plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
   geom_line(alpha = 0.4) +
+  theme(legend.position = "none") +
   geom_smooth(aes(group = county, color = county), se = FALSE, size = 1.0) +
   facet_wrap(~county, scales = "free_y") +
   scale_color_brewer(palette = "Set1") +
-  scale_x_discrete(breaks = c("2015", "2024"))
+  scale_x_discrete(breaks = c("2015", "2024")) +
+  labs(
+    title = "NYC Rental Prices by ZIP Code and Borough",
+    subtitle = "Each line represents a ZIP code; smoothed trends show borough averages",
+    x = "Year",
+    y = "Average Rent",
+    color = "Borough"
+  )
 ```
 
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
@@ -413,19 +390,6 @@ plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = 
     ## This warning is displayed once every 8 hours.
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
-
-``` r
-  labs(
-    title = "NYC Rental Prices by ZIP Code and Borough",
-    subtitle = "Each line represents a ZIP code; smoothed trends show borough averages",
-    x = "Year",
-    y = "Average Rent",
-    color = "Borough"
-  ) +
-  theme(legend.position = "none")
-```
-
-    ## NULL
 
 From this plot showing NYC rental prices within ZIP codes for all
 available years, we can see that in almost all the boroughs, starting in
@@ -467,24 +431,22 @@ rent_2023 = join_zillow_df |>
 plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
                       group = zip_code, color = county )) +
   geom_line(alpha = 0.5) +
+  theme(legend.position = "none") +
   facet_wrap(~ county, scales = "free_y") +
   scale_color_brewer(palette = "Set1") +
-  scale_x_discrete(breaks = c("Jan", "Dec"))
+  scale_x_discrete(breaks = c("Jan", "Dec")) +
   labs(
     title = "ZIP-Code-Level Average Rents by Month in 2023",
     x = "Month",
     y = "Average Rent",
     color = "Borough"
-  ) +
-  theme(legend.position = "none")
+  )
 ```
-
-    ## NULL
 
 From this plot showing average NYC rental prices each month in 2023
 across boroughs, we can see that Kings and New York county have more
 steady prices for each zip code throughout the year, however, for
-Richmond and Bronx county, there is more fluctuation in prices./
+Richmond and Bronx county, there is more fluctuation in prices.
 
 **Combining Plots**
 
@@ -509,4 +471,167 @@ combined_plot
 
 ![](hw_3_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
+Saving plot
+
+``` r
+ggsave(
+  filename = "combined_plot.png",  
+  plot = combined_plot,            
+  path = "results"
+)
+```
+
+    ## Saving 7 x 5 in image
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : pseudoinverse used at 10.02
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : neighborhood radius 2.02
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : reciprocal condition number 0
+
+    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    ## : There are other near singularities as well. 1
+
 ## Problem 3
+
+Load, tidy, merge, and otherwise organize the data sets. Your final
+dataset should include all originally observed variables; exclude
+participants less than 21 years of age, and those with missing
+demographic data; and encode data with reasonable variable classes
+(i.e. not numeric, and using factors with the ordering of tables and
+plots in mind).
+
+cleaning demographic file
+
+``` r
+demo_df = 
+  read_csv("data/nhanes_covar.csv") |> 
+  filter(row_number() > 3) 
+```
+
+    ## New names:
+    ## Rows: 254 Columns: 5
+    ## ── Column specification
+    ## ──────────────────────────────────────────────────────── Delimiter: "," chr
+    ## (5): ...1, 1 = male, ...3, ...4, 1 = Less than high school
+    ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+    ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## • `` -> `...1`
+    ## • `` -> `...3`
+    ## • `` -> `...4`
+
+``` r
+colnames(demo_df) <- demo_df[1, ] #assigning first row as column names
+demo_df <- demo_df[-1, ] #removing first row
+demo_df =
+  demo_df |> janitor::clean_names() |> 
+  filter(age >= 21) |> 
+  drop_na(sex, age, bmi, education) |> 
+  mutate(sex = as.character(sex), 
+         sex = case_match(
+           sex,
+           "1" ~ "male",
+           "2" ~ "female"),
+         education = as.factor(education),
+         seqn = as.numeric(seqn)
+  )
+```
+
+cleaning accel file
+
+``` r
+accel_df =
+  read.csv("data/nhanes_accel.csv") |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = min1:min1440,
+    names_to = "minute",
+    values_to = "mims"
+  ) |> 
+  mutate(minute = gsub("min", "", minute))
+```
+
+merging files
+
+``` r
+mims_df =
+  inner_join(demo_df, accel_df)
+```
+
+    ## Joining with `by = join_by(seqn)`
+
+Produce a reader-friendly table for the number of men and women in each
+education category
+
+``` r
+sex_educ =
+  demo_df |> 
+  count(sex, education) |> 
+  pivot_wider(names_from = sex, 
+              values_from = n) |> 
+  mutate(education = as.numeric(as.character(education)),
+         education =
+           case_match(
+             education,
+             1 ~ "Less than High School",
+             2 ~ "High School Equivalent",
+             3 ~ "More than High School"
+           ))
+
+knitr::kable(sex_educ, caption = "Number of Participants by Education Level and Sex")
+```
+
+| education              | female | male |
+|:-----------------------|-------:|-----:|
+| Less than High School  |     28 |   27 |
+| High School Equivalent |     23 |   35 |
+| More than High School  |     59 |   56 |
+
+Number of Participants by Education Level and Sex
+
+There are more males than females who have a high school equivalent
+education. The number of females who’ve done less than high school is
+similar to the number of males who’ve done less than highschool. This is
+the same case for those who’ve completed more than highschool.
+
+Create a visualization of the age distributions for men and women in
+each education category
+
+``` r
+#setting up data frame for plot
+demo_plot_df =
+  demo_df |> 
+  mutate(age = as.numeric(age),
+         education = as.numeric(as.character(education)),
+         education =
+           case_match(
+             education,
+             1 ~ "Less than High School",
+             2 ~ "High School Equivalent",
+             3 ~ "More than High School"
+           ))
+
+#plotting histogram
+ggplot(demo_plot_df, aes(x = age, fill = sex)) +
+  geom_histogram(binwidth = 10, position = "dodge") +
+  # Create a separate plot for each education category
+  facet_wrap(~ education) +
+  labs(
+    title = "Age Distribution by Education and Gender",
+    x = "Age",
+    y = "Count of Participants"
+  )
+```
+
+![](hw_3_files/figure-gfm/unnamed-chunk-21-1.png)<!-- --> Some key
+observations from this plot are that the ‘More than High School’
+category holds the largest number of participants and skewed towards a
+younger demographic. There is a prominent peak for females in the 20-30
+age bracket. In the other two groups, the age distribution is more
+evenly spread out across all age ranges. There is no single dominant age
+group. The overall number of participants in each age group is generally
+low.

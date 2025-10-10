@@ -190,7 +190,11 @@ avg_rent = join_zillow_df |>
   separate(date,
     into = c("year", "month","day"), sep = "-") |> 
   group_by(county, year) |> 
-  summarize(average_rent = mean(rent_price)) 
+  summarize(average_rent = mean(rent_price)) |> 
+  pivot_wider(
+    names_from = county,
+    values_from = average_rent
+  )
 
 knitr::kable(avg_rent)
 ```
@@ -275,7 +279,7 @@ plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
   
 ```
 
-From this plot showing average NYC rental prices each month in 2023 across boroughs, we can see that Kings and New York county have more steady prices for each zip code throughout the year, however, for Richmond and Bronx county, there is more fluctuation in prices./
+From this plot showing average NYC rental prices each month in 2023 across boroughs, we can see that Kings and New York county have more steady prices for each zip code throughout the year, however, for Richmond and Bronx county, there is more fluctuation in prices.
 
 
 **Combining Plots**
@@ -309,14 +313,15 @@ demo_df <- demo_df[-1, ] #removing first row
 demo_df =
   demo_df |> janitor::clean_names() |> 
   filter(age >= 21) |> 
-  drop_na(bmi) |> 
+  drop_na(sex, age, bmi, education) |> 
   mutate(sex = as.character(sex), 
          sex = case_match(
            sex,
            "1" ~ "male",
-           "2" ~ "female")
-  ) |> 
-  mutate(education = as.factor(education))
+           "2" ~ "female"),
+         education = as.factor(education),
+         seqn = as.numeric(seqn)
+  )
 ```
 
 
@@ -337,7 +342,7 @@ accel_df =
 merging files
 ```{r}
 mims_df =
-  left_join(demo_df, accel_df)
+  inner_join(demo_df, accel_df)
 ```
 
 
@@ -357,7 +362,7 @@ sex_educ =
              3 ~ "More than High School"
            ))
 
-knitr::kable(sex_educ)
+knitr::kable(sex_educ, caption = "Number of Participants by Education Level and Sex")
 ```
 
 There are more males than females who have a high school equivalent education. The number of females who've done less than high school is similar to the number of males who've done less than highschool. This is the same case for those who've completed more than highschool.
@@ -365,13 +370,33 @@ There are more males than females who have a high school equivalent education. T
 
 Create a visualization of the age distributions for men and women in each education category
 ```{r}
-demo_df |>
-  
-  group_by(sex, gender) |>
-  ggplot(demo_df, aes(x = age, color = sex)) +
-      geom_density()
-```
+#setting up data frame for plot
+demo_plot_df =
+  demo_df |> 
+  mutate(age = as.numeric(age),
+         education = as.numeric(as.character(education)),
+         education =
+           case_match(
+             education,
+             1 ~ "Less than High School",
+             2 ~ "High School Equivalent",
+             3 ~ "More than High School"
+           ))
 
+#plotting histogram
+ggplot(demo_plot_df, aes(x = age, fill = sex)) +
+  geom_histogram(binwidth = 10, position = "dodge") +
+  # Create a separate plot for each education category
+  facet_wrap(~ education) +
+  labs(
+    title = "Age Distribution by Education and Gender",
+    x = "Age",
+    y = "Count of Participants"
+  )
+  
+
+```
+Some key observations from this plot are that the 'More than High School' category holds the largest number of participants and skewed towards a younger demographic. There is a prominent peak for females in the 20-30 age bracket. In the other two groups, the age distribution is more evenly spread out across all age ranges. There is no single dominant age group. The overall number of participants in each age group is generally low.
 
 
 
