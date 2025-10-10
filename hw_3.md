@@ -573,7 +573,7 @@ low.
 
 <br> <br>
 
-**Looking at total acitivity over the day**
+**Looking at total activity over the day**
 
 Aggregating mims across minutes for each participant:
 
@@ -591,7 +591,9 @@ activity_df = mims_df |>
              1 ~ "Less than High School",
              2 ~ "High School Equivalent",
              3 ~ "More than High School"
-           ))
+           ),
+           age = as.numeric(age)
+         )
 ```
 
 <br>
