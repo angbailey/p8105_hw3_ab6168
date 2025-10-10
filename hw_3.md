@@ -184,7 +184,7 @@ knitr::kable(instacart |>
   pivot_wider(        
     names_from = order_dow, 
     values_from = mean_hour),
-  caption = "Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week"
+  title = "Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week."
 )
 ```
 
@@ -192,9 +192,6 @@ knitr::kable(instacart |>
 |:-----------------|-----:|-----:|-----:|-----:|-----:|-----:|-----:|
 | Coffee Ice Cream | 13.8 | 14.3 | 15.4 | 15.3 | 15.2 | 12.3 | 13.8 |
 | Pink Lady Apples | 13.4 | 11.4 | 11.7 | 14.2 | 11.6 | 12.8 | 11.9 |
-
-Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are
-ordered on each day of the week
 
 ## Problem 2
 
@@ -320,38 +317,33 @@ avg_rent = join_zillow_df |>
   separate(date,
     into = c("year", "month","day"), sep = "-") |> 
   group_by(county, year) |> 
-  summarize(average_rent = mean(rent_price)) |> 
+  summarize(average_rent = round(mean(rent_price),1), .groups = "drop") |> 
   pivot_wider(
     names_from = county,
     values_from = average_rent
   )
-```
 
-    ## `summarise()` has grouped output by 'county'. You can override using the
-    ## `.groups` argument.
-
-``` r
 knitr::kable(avg_rent)
 ```
 
-| year |    Bronx |    Kings | New York |   Queens | Richmond |
-|:-----|---------:|---------:|---------:|---------:|---------:|
-| 2015 | 1759.595 | 2492.928 | 3022.042 | 2214.707 |       NA |
-| 2016 | 1520.194 | 2520.357 | 3038.818 | 2271.955 |       NA |
-| 2017 | 1543.599 | 2545.828 | 3133.848 | 2263.303 |       NA |
-| 2018 | 1639.430 | 2547.291 | 3183.703 | 2291.918 |       NA |
-| 2019 | 1705.589 | 2630.504 | 3310.408 | 2387.816 |       NA |
-| 2020 | 1811.443 | 2555.051 | 3106.517 | 2315.632 | 1977.608 |
-| 2021 | 1857.777 | 2549.890 | 3136.632 | 2210.787 | 2045.430 |
-| 2022 | 2054.267 | 2868.199 | 3778.375 | 2406.038 | 2147.436 |
-| 2023 | 2285.459 | 3015.184 | 3932.610 | 2561.615 | 2332.934 |
-| 2024 | 2496.896 | 3126.803 | 4078.440 | 2694.022 | 2536.442 |
+| year |  Bronx |  Kings | New York | Queens | Richmond |
+|:-----|-------:|-------:|---------:|-------:|---------:|
+| 2015 | 1759.6 | 2492.9 |   3022.0 | 2214.7 |       NA |
+| 2016 | 1520.2 | 2520.4 |   3038.8 | 2272.0 |       NA |
+| 2017 | 1543.6 | 2545.8 |   3133.8 | 2263.3 |       NA |
+| 2018 | 1639.4 | 2547.3 |   3183.7 | 2291.9 |       NA |
+| 2019 | 1705.6 | 2630.5 |   3310.4 | 2387.8 |       NA |
+| 2020 | 1811.4 | 2555.1 |   3106.5 | 2315.6 |   1977.6 |
+| 2021 | 1857.8 | 2549.9 |   3136.6 | 2210.8 |   2045.4 |
+| 2022 | 2054.3 | 2868.2 |   3778.4 | 2406.0 |   2147.4 |
+| 2023 | 2285.5 | 3015.2 |   3932.6 | 2561.6 |   2332.9 |
+| 2024 | 2496.9 | 3126.8 |   4078.4 | 2694.0 |   2536.4 |
 
-In the Bronx, the rent was decreasing from 2015 to 2018. From 2019 to
-2024, the rent increases substantially. In Kings county, the rent
-increases substantially from 2021 to 2024.In New York, from 2021 to
-2022, the rent increases significantly. In Queens, from 2021 to 2024,
-the rent increases significantly.
+First, we can see that Richmond county does not have data from 2015 to
+2019. The most significant trend is the steep increase in rents across
+most boroughs from 2021 to 2024. From 2019 to 2020, we see that prices
+in boroughs like Manhattan, Brooklyn, and Queens dipped before
+increasing back in 2021, reflecting the market disruption around 2020.
 
 - Make a plot showing NYC Rental Prices within ZIP codes for all
   available years. Your plot should facilitate comparisons across
@@ -365,13 +357,12 @@ zip_avg = join_zillow_df |>
   group_by(county, zip_code, year) |> 
   summarize(mean_rent = mean(rent_price, na.rm = TRUE), .groups = "drop")
 
-#creating plot to compare across boroughs
-plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
+#creating plot to compare rent across boroughs
+plot1 = ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
   geom_line(alpha = 0.4) +
   theme(legend.position = "none") +
-  geom_smooth(aes(group = county, color = county), se = FALSE, size = 1.0) +
+  geom_smooth(aes(group = county, color = county), method = lm, se = FALSE, size = 1.0) +
   facet_wrap(~county, scales = "free_y") +
-  scale_color_brewer(palette = "Set1") +
   scale_x_discrete(breaks = c("2015", "2024")) +
   labs(
     title = "NYC Rental Prices by ZIP Code and Borough",
@@ -388,11 +379,21 @@ plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = 
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
 
-From this plot showing NYC rental prices within ZIP codes for all
-available years, we can see that in almost all the boroughs, starting in
-2021, the rent prices go through a steeper increase. Richmond county
-does not have data for the zip codes before 2020. New York has the
-highest rent prices.
+``` r
+plot1
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](hw_3_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+Some significant elements of this plot are that in Manhattan and
+Brooklyn, the spread of the rent prices across zip codes is large. In
+Manhattan, some ZIP codes have average rents approaching \$8,000, while
+others are closer to \$4,000. On the other hand, the lines for the
+Bronx, Queens, and Richmond are more close around their average trend
+lines. While there is still variation, the difference between the most
+and least expensice neighborhoods are significantly smaller.
 
 Compute the average rental price within each ZIP code over each month in
 2023. Make a reader-friendly plot showing the distribution of
@@ -424,7 +425,7 @@ rent_2023 = join_zillow_df |>
   ) |> 
   mutate(month = factor(month, levels = month.abb, ordered = TRUE))
 
-
+#creating plot showing zip code average rent for each month in 2023
 plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
                       group = zip_code, color = county )) +
   geom_line(alpha = 0.5) +
@@ -438,7 +439,11 @@ plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
     y = "Average Rent",
     color = "Borough"
   )
+
+plot2
 ```
+
+![](hw_3_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 From this plot showing average NYC rental prices each month in 2023
 across boroughs, we can see that Kings and New York county have more
@@ -452,19 +457,7 @@ combined_plot <- plot1/plot2
 combined_plot
 ```
 
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : pseudoinverse used at 10.02
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : neighborhood radius 2.02
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : reciprocal condition number 0
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : There are other near singularities as well. 1
+    ## `geom_smooth()` using formula = 'y ~ x'
 
 ![](hw_3_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
@@ -479,19 +472,7 @@ ggsave(
 ```
 
     ## Saving 7 x 5 in image
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : pseudoinverse used at 10.02
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : neighborhood radius 2.02
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : reciprocal condition number 0
-
-    ## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    ## : There are other near singularities as well. 1
+    ## `geom_smooth()` using formula = 'y ~ x'
 
 ## Problem 3
 
@@ -579,7 +560,7 @@ sex_educ =
              3 ~ "More than High School"
            ))
 
-knitr::kable(sex_educ, caption = "Number of Participants by Education Level and Sex")
+knitr::kable(sex_educ, title = "Number of Participants by Education Level and Sex")
 ```
 
 | education              | female | male |
@@ -587,8 +568,6 @@ knitr::kable(sex_educ, caption = "Number of Participants by Education Level and 
 | Less than High School  |     28 |   27 |
 | High School Equivalent |     23 |   35 |
 | More than High School  |     59 |   56 |
-
-Number of Participants by Education Level and Sex
 
 There are more males than females who have a high school equivalent
 education. The number of females who’ve done less than high school is

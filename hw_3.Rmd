@@ -11,7 +11,7 @@ editor_options:
 
 Loading instacart dataset
 
-```{r}
+```{r, results = "hide"}
 library(tidyverse)
 library(p8105.datasets)
 library(patchwork)
@@ -114,7 +114,7 @@ knitr::kable(instacart |>
   pivot_wider(        
     names_from = order_dow, 
     values_from = mean_hour),
-  caption = "Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week"
+  title = "Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week."
 )
 ```
 
@@ -123,7 +123,7 @@ knitr::kable(instacart |>
 
 Tidying Zillow datasets
 
-```{r}
+```{r, results = "hide"}
 zori_df =
   read_csv("data/zori_NYC.csv") |> 
   select(-StateName, -State, -City, -Metro, - RegionType) |> 
@@ -189,7 +189,7 @@ avg_rent = join_zillow_df |>
   separate(date,
     into = c("year", "month","day"), sep = "-") |> 
   group_by(county, year) |> 
-  summarize(average_rent = mean(rent_price)) |> 
+  summarize(average_rent = round(mean(rent_price),1), .groups = "drop") |> 
   pivot_wider(
     names_from = county,
     values_from = average_rent
@@ -198,7 +198,7 @@ avg_rent = join_zillow_df |>
 knitr::kable(avg_rent)
 ```
 
-In the Bronx, the rent was decreasing from 2015 to 2018. From 2019 to 2024, the rent increases substantially. In Kings county, the rent increases substantially from 2021 to 2024.In New York, from 2021 to 2022, the rent increases significantly. In Queens, from 2021 to 2024, the rent increases significantly.
+First, we can see that Richmond county does not have data from 2015 to 2019. The most significant trend is the steep increase in rents across most boroughs from 2021 to 2024. From 2019 to 2020, we see that prices in boroughs like Manhattan, Brooklyn, and Queens dipped before increasing back in 2021, reflecting the market disruption around 2020.
 
 -   Make a plot showing NYC Rental Prices within ZIP codes for all available years. Your plot should facilitate comparisons across boroughs.
 
@@ -210,13 +210,12 @@ zip_avg = join_zillow_df |>
   group_by(county, zip_code, year) |> 
   summarize(mean_rent = mean(rent_price, na.rm = TRUE), .groups = "drop")
 
-#creating plot to compare across boroughs
-plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
+#creating plot to compare rent across boroughs
+plot1 = ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
   geom_line(alpha = 0.4) +
   theme(legend.position = "none") +
-  geom_smooth(aes(group = county, color = county), se = FALSE, size = 1.0) +
+  geom_smooth(aes(group = county, color = county), method = lm, se = FALSE, size = 1.0) +
   facet_wrap(~county, scales = "free_y") +
-  scale_color_brewer(palette = "Set1") +
   scale_x_discrete(breaks = c("2015", "2024")) +
   labs(
     title = "NYC Rental Prices by ZIP Code and Borough",
@@ -225,10 +224,14 @@ plot1 <- ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = 
     y = "Average Rent",
     color = "Borough"
   )
+
+plot1
     
 ```
 
-From this plot showing NYC rental prices within ZIP codes for all available years, we can see that in almost all the boroughs, starting in 2021, the rent prices go through a steeper increase. Richmond county does not have data for the zip codes before 2020. New York has the highest rent prices.
+Some significant elements of this plot are that in Manhattan and Brooklyn, the spread of the rent prices across zip codes is large. In Manhattan, some ZIP codes have average rents approaching $8,000, while others are closer to $4,000. On the other hand, the lines for the Bronx, Queens, and Richmond are more close around their average trend lines. While there is still variation, the difference between the most and least expensice neighborhoods are significantly smaller.
+
+
 
 
 Compute the average rental price within each ZIP code over each month in 2023. Make a reader-friendly plot showing the distribution of ZIP-code-level rental prices across boroughs
@@ -259,7 +262,7 @@ rent_2023 = join_zillow_df |>
   ) |> 
   mutate(month = factor(month, levels = month.abb, ordered = TRUE))
 
-
+#creating plot showing zip code average rent for each month in 2023
 plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
                       group = zip_code, color = county )) +
   geom_line(alpha = 0.5) +
@@ -274,7 +277,7 @@ plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
     color = "Borough"
   )
 
-
+plot2
   
 ```
 
@@ -361,7 +364,7 @@ sex_educ =
              3 ~ "More than High School"
            ))
 
-knitr::kable(sex_educ, caption = "Number of Participants by Education Level and Sex")
+knitr::kable(sex_educ, title = "Number of Participants by Education Level and Sex")
 ```
 
 There are more males than females who have a high school equivalent education. The number of females who've done less than high school is similar to the number of males who've done less than highschool. This is the same case for those who've completed more than highschool.
