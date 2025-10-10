@@ -31,7 +31,6 @@ Viewing dataset
 
 ``` r
 data("instacart")
-view(instacart)
 ```
 
 **Description**:
@@ -178,26 +177,24 @@ knitr::kable(
 ``` r
 knitr::kable(instacart |> 
   filter(
-    product_name == c("Pink Lady Apples", "Coffee Ice Cream")) |>  
+    product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) |>  
   group_by(product_name, order_dow) |>  
   summarise(
-    mean_hour = round(mean(order_hour_of_day),1), .groups = "drop"  #getting mean for each day
-    ) |> 
+    mean_hour = round(mean(order_hour_of_day),1), .groups = "drop") |> 
   pivot_wider(        
     names_from = order_dow, 
-    values_from = mean_hour)
+    values_from = mean_hour),
+  caption = "Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week"
 )
 ```
 
-    ## Warning: There was 1 warning in `filter()`.
-    ## ℹ In argument: `product_name == c("Pink Lady Apples", "Coffee Ice Cream")`.
-    ## Caused by warning in `product_name == c("Pink Lady Apples", "Coffee Ice Cream")`:
-    ## ! longer object length is not a multiple of shorter object length
-
 | product_name     |    0 |    1 |    2 |    3 |    4 |    5 |    6 |
 |:-----------------|-----:|-----:|-----:|-----:|-----:|-----:|-----:|
-| Coffee Ice Cream | 13.2 | 15.0 | 15.3 | 15.4 | 15.2 | 10.3 | 12.4 |
-| Pink Lady Apples | 12.2 | 11.7 | 12.0 | 13.9 | 11.9 | 13.9 | 11.6 |
+| Coffee Ice Cream | 13.8 | 14.3 | 15.4 | 15.3 | 15.2 | 12.3 | 13.8 |
+| Pink Lady Apples | 13.4 | 11.4 | 11.7 | 14.2 | 11.6 | 12.8 | 11.9 |
+
+Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are
+ordered on each day of the week
 
 ## Problem 2
 
