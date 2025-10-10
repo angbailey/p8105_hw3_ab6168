@@ -11,7 +11,7 @@ editor_options:
 
 Loading instacart dataset
 
-```{r, results = "hide"}
+```{r, message=FALSE}
 library(tidyverse)
 library(p8105.datasets)
 library(patchwork)
@@ -22,6 +22,7 @@ Viewing dataset
 ```{r}
 data("instacart")
 ```
+<br>
 
 **Description**:
 
@@ -51,8 +52,10 @@ A few observations:
 knitr::kable(instacart |> count(product_name, sort = TRUE) |> 
                slice_head(n = 10))
 ```
+<br>
+<br>
 
--   How many aisles are there, and which aisles are the most items ordered from?
+**How many aisles are there, and which aisles are the most items ordered from?**
 
 ```{r}
 #getting number of unique aisles
@@ -65,9 +68,10 @@ instacart |> count(aisle, sort = TRUE)
 ```
 
 There are **134 aisles**. Most items are ordered from the **Fresh Vegetables** and **Fresh Fruits** aisle.
+<br>
 
 
--   Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+**Plot showing the number of items ordered in each aisle.**
 
 ```{r}
 #making bar chart
@@ -83,9 +87,9 @@ instacart |>
        y = "Number of Items Ordered"
     )
 ```
+<br>
 
-
--   Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+**Three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.**
 
 ```{r}
 knitr::kable(
@@ -100,9 +104,9 @@ knitr::kable(
 )
 
 ```
+<br>
 
-
--   Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+**Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week.**
 
 ```{r}
 knitr::kable(instacart |> 
@@ -113,17 +117,17 @@ knitr::kable(instacart |>
     mean_hour = round(mean(order_hour_of_day),1), .groups = "drop") |> 
   pivot_wider(        
     names_from = order_dow, 
-    values_from = mean_hour),
-  title = "Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week."
+    values_from = mean_hour)
 )
 ```
-
+<br>
+<br>
 
 ## Problem 2
 
 Tidying Zillow datasets
 
-```{r, results = "hide"}
+```{r, message=FALSE}
 zori_df =
   read_csv("data/zori_NYC.csv") |> 
   select(-StateName, -State, -City, -Metro, - RegionType) |> 
@@ -153,9 +157,9 @@ join_zillow_df =
   left_join(zori_df, zip_df, by = c("zip_code", "county")) |> 
   drop_na(rent_price)
 ```
+<br>
 
-
--   There are 116 months between January 2015 and August 2024. How many ZIP codes are observed 116 times? How many are observed fewer than 10 times? Why are some ZIP codes are observed rarely and others observed in each month?
+**How many ZIP codes are observed 116 times? How many are observed fewer than 10 times? Why are some ZIP codes are observed rarely and others observed in each month?**
 
 ```{r}
 #How many ZIP codes are observed 116 times?
@@ -167,7 +171,6 @@ join_zillow_df |>
 
 There are **48 zip codes** that are observed 116 times.
 
-
 ```{r}
 #How many ZIP codes are observed fewer than 10 times?
 
@@ -178,8 +181,8 @@ join_zillow_df |>
 
 There are **26 zip codes** that are observed fewer than 10 times.
 
-Some ZIP codes are observed rarely because there is a lack of information on the rent prices for this zip codes depending on the area. There may be little to no rent properties in certain areas.
-
+Some ZIP codes may be observed rarely because there is a lack of information on the rent prices for those zip codes depending on the area. There may be little to no rent properties in certain areas.
+<br>
 
 **Table showing average rental price by borough and year**
 
@@ -199,10 +202,11 @@ knitr::kable(avg_rent)
 ```
 
 First, we can see that Richmond county does not have data from 2015 to 2019. The most significant trend is the steep increase in rents across most boroughs from 2021 to 2024. From 2019 to 2020, we see that prices in boroughs like Manhattan, Brooklyn, and Queens dipped before increasing back in 2021, reflecting the market disruption around 2020.
+<br>
 
--   Make a plot showing NYC Rental Prices within ZIP codes for all available years. Your plot should facilitate comparisons across boroughs.
+**Make a plot showing NYC Rental Prices within ZIP codes for all available years. Your plot should facilitate comparisons across boroughs.**
 
-```{r}
+```{r, message = FALSE}
 #average rent per zip per year
 zip_avg = join_zillow_df |> 
   separate(date,
@@ -229,12 +233,10 @@ plot1
     
 ```
 
-Some significant elements of this plot are that in Manhattan and Brooklyn, the spread of the rent prices across zip codes is large. In Manhattan, some ZIP codes have average rents approaching $8,000, while others are closer to $4,000. On the other hand, the lines for the Bronx, Queens, and Richmond are more close around their average trend lines. While there is still variation, the difference between the most and least expensice neighborhoods are significantly smaller.
+Some significant elements of this plot are that in Manhattan and Brooklyn, the spread of the rent prices across zip codes is large. In Manhattan, some ZIP codes have average rents approaching \$8,000, while others are closer to \$4,000. On the other hand, the lines for the Bronx, Queens, and Richmond are more close around their average trend lines. While there is still variation, the difference between the most and least expensice neighborhoods are significantly smaller.
+<br>
 
-
-
-
-Compute the average rental price within each ZIP code over each month in 2023. Make a reader-friendly plot showing the distribution of ZIP-code-level rental prices across boroughs
+**Compute the average rental price within each ZIP code over each month in 2023. Make a reader-friendly plot showing the distribution of ZIP-code-level rental prices across boroughs**
 
 ```{r}
 #computing average rent within each zip in 2023
@@ -282,7 +284,7 @@ plot2
 ```
 
 From this plot showing average NYC rental prices each month in 2023 across boroughs, we can see that Kings and New York county have more steady prices for each zip code throughout the year, however, for Richmond and Bronx county, there is more fluctuation in prices.
-
+<br>
 
 **Combining Plots**
 
@@ -292,20 +294,21 @@ combined_plot
 ```
 
 Saving plot
-```{r}
+
+```{r, message = FALSE}
 ggsave(
   filename = "combined_plot.png",  
   plot = combined_plot,            
   path = "results"
 )
 ```
-
+<br>
+<br>
 
 ## Problem 3
 
-Load, tidy, merge, and otherwise organize the data sets. Your final dataset should include all originally observed variables; exclude participants less than 21 years of age, and those with missing demographic data; and encode data with reasonable variable classes (i.e. not numeric, and using factors with the ordering of tables and plots in mind).
+Cleaning demographic dataset
 
-cleaning demographic file
 ```{r}
 demo_df = 
   read_csv("data/nhanes_covar.csv") |> 
@@ -325,9 +328,10 @@ demo_df =
          seqn = as.numeric(seqn)
   )
 ```
+<br>
 
+Cleaning accelerometer dataset
 
-cleaning accel file
 ```{r}
 accel_df =
   read.csv("data/nhanes_accel.csv") |> 
@@ -340,15 +344,16 @@ accel_df =
   mutate(minute = gsub("min", "", minute))
 ```
 
+Merging datasets
 
-merging files
 ```{r}
 mims_df =
   inner_join(demo_df, accel_df)
 ```
+<br>
 
+**Produce a reader-friendly table for the number of men and women in each education category**
 
-Produce a reader-friendly table for the number of men and women in each education category
 ```{r}
 sex_educ =
   demo_df |> 
@@ -368,9 +373,10 @@ knitr::kable(sex_educ, title = "Number of Participants by Education Level and Se
 ```
 
 There are more males than females who have a high school equivalent education. The number of females who've done less than high school is similar to the number of males who've done less than highschool. This is the same case for those who've completed more than highschool.
+<br>
 
+**Create a visualization of the age distributions for men and women in each education category**
 
-Create a visualization of the age distributions for men and women in each education category
 ```{r}
 #setting up data frame for plot
 demo_plot_df =
@@ -398,29 +404,5 @@ ggplot(demo_plot_df, aes(x = age, fill = sex)) +
   
 
 ```
+<br>
 Some key observations from this plot are that the 'More than High School' category holds the largest number of participants and skewed towards a younger demographic. There is a prominent peak for females in the 20-30 age bracket. In the other two groups, the age distribution is more evenly spread out across all age ranges. There is no single dominant age group. The overall number of participants in each age group is generally low.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

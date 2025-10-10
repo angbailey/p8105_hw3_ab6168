@@ -9,20 +9,6 @@ Loading instacart dataset
 
 ``` r
 library(tidyverse)
-```
-
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-    ## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-    ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.1.0     
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
 library(p8105.datasets)
 library(patchwork)
 ```
@@ -32,6 +18,8 @@ Viewing dataset
 ``` r
 data("instacart")
 ```
+
+<br>
 
 **Description**:
 
@@ -83,8 +71,10 @@ knitr::kable(instacart |> count(product_name, sort = TRUE) |>
 | Limes                  |  6033 |
 | Organic Raspberries    |  5546 |
 
-- How many aisles are there, and which aisles are the most items ordered
-  from?
+<br> <br>
+
+**How many aisles are there, and which aisles are the most items ordered
+from?**
 
 ``` r
 #getting number of unique aisles
@@ -117,11 +107,9 @@ instacart |> count(aisle, sort = TRUE)
     ## # ℹ 124 more rows
 
 There are **134 aisles**. Most items are ordered from the **Fresh
-Vegetables** and **Fresh Fruits** aisle.
+Vegetables** and **Fresh Fruits** aisle. <br>
 
-- Make a plot that shows the number of items ordered in each aisle,
-  limiting this to aisles with more than 10000 items ordered. Arrange
-  aisles sensibly, and organize your plot so others can read it.
+**Plot showing the number of items ordered in each aisle.**
 
 ``` r
 #making bar chart
@@ -138,12 +126,10 @@ instacart |>
     )
 ```
 
-![](hw_3_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](hw_3_files/figure-gfm/unnamed-chunk-6-1.png)<!-- --> <br>
 
-- Make a table showing the three most popular items in each of the
-  aisles “baking ingredients”, “dog food care”, and “packaged vegetables
-  fruits”. Include the number of times each item is ordered in your
-  table.
+**Three most popular items in each of the aisles “baking ingredients”,
+“dog food care”, and “packaged vegetables fruits”.**
 
 ``` r
 knitr::kable(
@@ -170,9 +156,10 @@ knitr::kable(
 | packaged vegetables fruits | Organic Raspberries | 1920 |
 | packaged vegetables fruits | Organic Blueberries | 1692 |
 
-- Make a table showing the mean hour of the day at which Pink Lady
-  Apples and Coffee Ice Cream are ordered on each day of the week;
-  format this table for human readers (i.e. produce a 2 x 7 table).
+<br>
+
+**Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream
+are ordered on each day of the week.**
 
 ``` r
 knitr::kable(instacart |> 
@@ -183,8 +170,7 @@ knitr::kable(instacart |>
     mean_hour = round(mean(order_hour_of_day),1), .groups = "drop") |> 
   pivot_wider(        
     names_from = order_dow, 
-    values_from = mean_hour),
-  title = "Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week."
+    values_from = mean_hour)
 )
 ```
 
@@ -192,6 +178,8 @@ knitr::kable(instacart |>
 |:-----------------|-----:|-----:|-----:|-----:|-----:|-----:|-----:|
 | Coffee Ice Cream | 13.8 | 14.3 | 15.4 | 15.3 | 15.2 | 12.3 | 13.8 |
 | Pink Lady Apples | 13.4 | 11.4 | 11.7 | 14.2 | 11.6 | 12.8 | 11.9 |
+
+<br> <br>
 
 ## Problem 2
 
@@ -216,44 +204,23 @@ zori_df =
     names_to = "date",
     values_to = "rent_price"
   )
-```
 
-    ## Rows: 149 Columns: 125
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr   (6): RegionType, StateName, State, City, Metro, CountyName
-    ## dbl (119): RegionID, SizeRank, RegionName, 2015-01-31, 2015-02-28, 2015-03-3...
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 zip_df = 
   read_csv("data/Zip Codes.csv") |> 
   janitor::clean_names() |> 
   select(-state_fips, -file_date)
-```
 
-    ## Rows: 322 Columns: 7
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (4): County, County Code, File Date, Neighborhood
-    ## dbl (3): State FIPS, County FIPS, ZipCode
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 #joining datasets
 join_zillow_df = 
   left_join(zori_df, zip_df, by = c("zip_code", "county")) |> 
   drop_na(rent_price)
 ```
 
-- There are 116 months between January 2015 and August 2024. How many
-  ZIP codes are observed 116 times? How many are observed fewer than 10
-  times? Why are some ZIP codes are observed rarely and others observed
-  in each month?
+<br>
+
+**How many ZIP codes are observed 116 times? How many are observed fewer
+than 10 times? Why are some ZIP codes are observed rarely and others
+observed in each month?**
 
 ``` r
 #How many ZIP codes are observed 116 times?
@@ -305,9 +272,9 @@ join_zillow_df |>
 
 There are **26 zip codes** that are observed fewer than 10 times.
 
-Some ZIP codes are observed rarely because there is a lack of
-information on the rent prices for this zip codes depending on the area.
-There may be little to no rent properties in certain areas.
+Some ZIP codes may be observed rarely because there is a lack of
+information on the rent prices for those zip codes depending on the
+area. There may be little to no rent properties in certain areas. <br>
 
 **Table showing average rental price by borough and year**
 
@@ -344,10 +311,11 @@ First, we can see that Richmond county does not have data from 2015 to
 most boroughs from 2021 to 2024. From 2019 to 2020, we see that prices
 in boroughs like Manhattan, Brooklyn, and Queens dipped before
 increasing back in 2021, reflecting the market disruption around 2020.
+<br>
 
-- Make a plot showing NYC Rental Prices within ZIP codes for all
-  available years. Your plot should facilitate comparisons across
-  boroughs.
+**Make a plot showing NYC Rental Prices within ZIP codes for all
+available years. Your plot should facilitate comparisons across
+boroughs.**
 
 ``` r
 #average rent per zip per year
@@ -383,8 +351,6 @@ plot1 = ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = c
 plot1
 ```
 
-    ## `geom_smooth()` using formula = 'y ~ x'
-
 ![](hw_3_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 Some significant elements of this plot are that in Manhattan and
@@ -393,11 +359,11 @@ Manhattan, some ZIP codes have average rents approaching \$8,000, while
 others are closer to \$4,000. On the other hand, the lines for the
 Bronx, Queens, and Richmond are more close around their average trend
 lines. While there is still variation, the difference between the most
-and least expensice neighborhoods are significantly smaller.
+and least expensice neighborhoods are significantly smaller. <br>
 
-Compute the average rental price within each ZIP code over each month in
-2023. Make a reader-friendly plot showing the distribution of
-ZIP-code-level rental prices across boroughs
+**Compute the average rental price within each ZIP code over each month
+in 2023. Make a reader-friendly plot showing the distribution of
+ZIP-code-level rental prices across boroughs**
 
 ``` r
 #computing average rent within each zip in 2023
@@ -448,7 +414,7 @@ plot2
 From this plot showing average NYC rental prices each month in 2023
 across boroughs, we can see that Kings and New York county have more
 steady prices for each zip code throughout the year, however, for
-Richmond and Bronx county, there is more fluctuation in prices.
+Richmond and Bronx county, there is more fluctuation in prices. <br>
 
 **Combining Plots**
 
@@ -471,19 +437,11 @@ ggsave(
 )
 ```
 
-    ## Saving 7 x 5 in image
-    ## `geom_smooth()` using formula = 'y ~ x'
+<br> <br>
 
 ## Problem 3
 
-Load, tidy, merge, and otherwise organize the data sets. Your final
-dataset should include all originally observed variables; exclude
-participants less than 21 years of age, and those with missing
-demographic data; and encode data with reasonable variable classes
-(i.e. not numeric, and using factors with the ordering of tables and
-plots in mind).
-
-cleaning demographic file
+Cleaning demographic dataset
 
 ``` r
 demo_df = 
@@ -519,7 +477,9 @@ demo_df =
   )
 ```
 
-cleaning accel file
+<br>
+
+Cleaning accelerometer dataset
 
 ``` r
 accel_df =
@@ -533,7 +493,7 @@ accel_df =
   mutate(minute = gsub("min", "", minute))
 ```
 
-merging files
+Merging datasets
 
 ``` r
 mims_df =
@@ -542,8 +502,10 @@ mims_df =
 
     ## Joining with `by = join_by(seqn)`
 
-Produce a reader-friendly table for the number of men and women in each
-education category
+<br>
+
+**Produce a reader-friendly table for the number of men and women in
+each education category**
 
 ``` r
 sex_educ =
@@ -572,10 +534,10 @@ knitr::kable(sex_educ, title = "Number of Participants by Education Level and Se
 There are more males than females who have a high school equivalent
 education. The number of females who’ve done less than high school is
 similar to the number of males who’ve done less than highschool. This is
-the same case for those who’ve completed more than highschool.
+the same case for those who’ve completed more than highschool. <br>
 
-Create a visualization of the age distributions for men and women in
-each education category
+**Create a visualization of the age distributions for men and women in
+each education category**
 
 ``` r
 #setting up data frame for plot
@@ -603,7 +565,7 @@ ggplot(demo_plot_df, aes(x = age, fill = sex)) +
   )
 ```
 
-![](hw_3_files/figure-gfm/unnamed-chunk-21-1.png)<!-- --> Some key
+![](hw_3_files/figure-gfm/unnamed-chunk-21-1.png)<!-- --> <br> Some key
 observations from this plot are that the ‘More than High School’
 category holds the largest number of participants and skewed towards a
 younger demographic. There is a prominent peak for females in the 20-30
