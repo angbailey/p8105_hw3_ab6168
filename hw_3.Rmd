@@ -215,7 +215,10 @@ zip_avg = join_zillow_df |>
            into = c("year", "month","day"), sep = "-") |> 
   group_by(county, zip_code, year) |> 
   summarize(mean_rent = mean(rent_price, na.rm = TRUE), .groups = "drop")
+    
+```
 
+```{r, fig.width=7, fig.height=7}
 #creating plot to compare rent across boroughs
 plot1 = ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
   geom_line(alpha = 0.4) +
@@ -232,8 +235,8 @@ plot1 = ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = c
   )
 
 plot1
-    
 ```
+
 
 Some significant elements of this plot are that in Manhattan and Brooklyn, the spread of the rent prices across zip codes is large. In Manhattan, some ZIP codes have average rents approaching \$8,000, while others are closer to \$4,000. On the other hand, the lines for the Bronx, Queens, and Richmond are more close around their average trend lines. While there is still variation, the difference between the most and least expensice neighborhoods are significantly smaller.
 
@@ -266,7 +269,10 @@ rent_2023 = join_zillow_df |>
     )
   ) |> 
   mutate(month = factor(month, levels = month.abb, ordered = TRUE))
+  
+```
 
+```{r, fig.width=7, fig.height=5}
 #creating plot showing zip code average rent for each month in 2023
 plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
                       group = zip_code, color = county )) +
@@ -283,8 +289,8 @@ plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
   )
 
 plot2
-  
 ```
+
 
 From this plot showing average NYC rental prices each month in 2023 across boroughs, we can see that Kings and New York county have more steady prices for each zip code throughout the year, however, for Richmond and Bronx county, there is more fluctuation in prices.
 
@@ -292,7 +298,7 @@ From this plot showing average NYC rental prices each month in 2023 across borou
 
 **Combining Plots**
 
-```{r}
+```{r, fig.width=8, fig.height=11}
 combined_plot <- plot1/plot2
 combined_plot
 ```

@@ -329,7 +329,9 @@ zip_avg = join_zillow_df |>
            into = c("year", "month","day"), sep = "-") |> 
   group_by(county, zip_code, year) |> 
   summarize(mean_rent = mean(rent_price, na.rm = TRUE), .groups = "drop")
+```
 
+``` r
 #creating plot to compare rent across boroughs
 plot1 = ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = county)) +
   geom_line(alpha = 0.4) +
@@ -356,7 +358,9 @@ plot1 = ggplot(zip_avg, aes(x = year, y = mean_rent, group = zip_code, color = c
 plot1
 ```
 
-![](hw_3_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](hw_3_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 Some significant elements of this plot are that in Manhattan and
 Brooklyn, the spread of the rent prices across zip codes is large. In
@@ -397,7 +401,9 @@ rent_2023 = join_zillow_df |>
     )
   ) |> 
   mutate(month = factor(month, levels = month.abb, ordered = TRUE))
+```
 
+``` r
 #creating plot showing zip code average rent for each month in 2023
 plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent, 
                       group = zip_code, color = county )) +
@@ -416,7 +422,7 @@ plot2 <- ggplot(rent_2023, aes(x = month, y = avg_monthly_rent,
 plot2
 ```
 
-![](hw_3_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](hw_3_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 From this plot showing average NYC rental prices each month in 2023
 across boroughs, we can see that Kings and New York county have more
@@ -434,7 +440,7 @@ combined_plot
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
-![](hw_3_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](hw_3_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 Saving plot
 
@@ -562,7 +568,7 @@ ggplot(demo_plot_df, aes(x = age, fill = sex)) +
   )
 ```
 
-![](hw_3_files/figure-gfm/unnamed-chunk-21-1.png)<!-- --> <br> Some key
+![](hw_3_files/figure-gfm/unnamed-chunk-23-1.png)<!-- --> <br> Some key
 observations from this plot are that the ‘More than High School’
 category holds the largest number of participants and skewed towards a
 younger demographic. There is a prominent peak for females in the 20-30
@@ -616,7 +622,7 @@ ggplot(activity_df, aes(x = age, y = total_activity, color = sex)) +
 
     ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 
-![](hw_3_files/figure-gfm/unnamed-chunk-23-1.png)<!-- --> <br>
+![](hw_3_files/figure-gfm/unnamed-chunk-25-1.png)<!-- --> <br>
 
 Across all education levels, we see a general decline in total activity
 as participants get older. In the High School Equivalent group, we know
@@ -672,7 +678,7 @@ ggplot(hourly_activity, aes(x = hour_of_day, y = mean_hourly_activity, fill = se
   )
 ```
 
-![](hw_3_files/figure-gfm/unnamed-chunk-25-1.png)<!-- --> <br>
+![](hw_3_files/figure-gfm/unnamed-chunk-27-1.png)<!-- --> <br>
 
 The hourly activity in the “High School Equivalent” and “Less than High
 School” groups follow a similar pattern. Activity beings to rise around
